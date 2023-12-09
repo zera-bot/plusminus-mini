@@ -127,11 +127,41 @@ class NumericalComponent:
         return mainSum+approximateSum
 
     def __truediv__(self,other):
-        return "Not done Yet!"
+        componentsThatAreZero = 0
+
+        mainSum = NumericalComponent(sqrt_components=[])
+
+        if other.real == frac(0): componentsThatAreZero+=1
+        if other.imaginary == frac(0): componentsThatAreZero+=1
+        if other.pi_multiple == frac(0): componentsThatAreZero+=1
+
+        #if only one component is the divisor
+        if (len(other.sqrt_components) == 1 and componentsThatAreZero == 3) or (len(other.sqrt_components) == 0 and componentsThatAreZero == 2):
+            if len(other.sqrt_components) == 0:
+                if other.imaginary != frac(0): #if we are dividing by only imaginary value
+                    sqrtAndPiSumSelf = frac(0)
+                    for r in self.sqrt_components:
+                        sqrtAndPiSumSelf += r[0]*xmath.sqrt(r[1])
+                    sqrtAndPiSumSelf+=xmath.pi*self.pi_multiple
+
+                    mainSum+=NumericalComponent(self.imaginary/other.imaginary,-(self.real/other.imaginary + sqrtAndPiSumSelf/other.imaginary))
+                else: #if we are dividing by only a real value
+                    sqrtSumOther = frac(0)
+                    for r in other.sqrt_components:
+                        sqrtSumOther+=r[0]*xmath.sqrt(r[1])
+
+                    divisionValue = other.real+(other.pi_multiple*xmath.pi)+sqrtSumOther
+
+                    mainSum+=NumericalComponent(self.real/divisionValue, self.imaginary/divisionValue,
+                    self.pi_multiple/divisionValue, [[k[0]/divisionValue,k[1]] for k in self.sqrt_components])
+        else: #just approximate at this point
+            mainSum = self * (other**-1)
+
+        return mainSum
     
     def __pow__(self,other):
         val = complex(self) ** complex(other)
-        return NumericalComponent(val.real,val.imag)
+        return NumericalComponent(Fraction(val.real),Fraction(val.imag))
 
     #display
 
@@ -142,8 +172,9 @@ class NumericalComponent:
         if self.pi_multiple != frac(0): s.append(str(self.pi_multiple)+"pi")
         for r in self.sqrt_components:
             s.append(f"{r[0]}sqrt({r[1]})")
-
-        return " + ".join(s)
+        
+        r = " + ".join(s)
+        return r.replace("+ -","- ")
 
     #other
 
@@ -156,6 +187,15 @@ class NumericalComponent:
         for w in self.sqrt_components:
             v += complex(w[0]*xmath.sqrt(w[1]),0)
         return v
+
+    def isOnlyReal(self):
+        return self.imaginary == frac(0)
+
+    def isOnlyRationalReal(self):
+        return self.imaginary == frac(0) and self.pi_multiple == frac(0) and len(self.sqrt_components) == frac(0)
+
+    #def __nonzero__(self):
+    #    return not self.real == 0 and self.imaginary == 0 and self.pi_multiple == 0 and len(self.sqrt_components) == 0
 
 # library
 
@@ -249,6 +289,28 @@ def c_tanh(x):
 def substitute(f,x):
     return f(x)
 
+def findRoot(f,a,b,iterations=4700): # range is [a,b]
+    stoppingThreshold = Fraction("1e-12")
+    checkThreshold = Fraction("1e-8")
+    median = (a+b)/frac(2)
+
+    x_nM2 = median #x_(n-2)
+    x_nM1 = median #x_(n-1)
+    x_n = frac(0)
+    n = frac(2)
+
+    for i in range(iterations):
+        if f(x_n) < stoppingThreshold and f(x_n) > -stoppingThreshold:
+            break
+        n+=frac(1)
+        x_nM2 = x_nM1
+        x_nM1 = x_n
+        x_n = x_nM1 -f(x_nM1) * ( (x_nM1 - x_nM2) / ( f(x_nM1) - f(x_nM2) ) )
+
+    if not ( ( f(x_n) < checkThreshold and f(x_n) > -checkThreshold ) and ( f(x_nM1) < checkThreshold and f(x_nM1) > -checkThreshold ) ):
+        return None
+    return NumericalComponent(Fraction(float(x_n)))
+
 
 
 a = NumericalComponent(frac(3),frac(4),frac(4),[[frac(2),frac(3)]])
@@ -256,6 +318,13 @@ b = NumericalComponent(frac(-1),frac(3),frac(-4),[[frac(2),frac(3)],[frac(4),fra
 
 c = NumericalComponent(Fraction(3,2),Fraction(6,7))
 
-#print(c_choose(NumericalComponent(3),NumericalComponent(4)))
+f = lambda x: x**frac(2) - frac(4)*x
+g = lambda x: (x-frac(3))*(x+frac(5))*(x+frac(7))
 
-print(substitute(lambda x: x**frac(2) - frac(4)*x + frac(5) , frac(4)))
+print(c)
+
+print(c_choose(NumericalComponent(3),NumericalComponent(4)))
+
+print(NumericalComponent(frac(5),frac(5),frac(5),[[frac(5),frac(2)]])/NumericalComponent(imaginary=frac(4)))
+
+print(findRoot(g,Fraction(3.5),Fraction(4.5)))
