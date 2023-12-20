@@ -27,19 +27,27 @@ class NumericalComponent:
         self.real = real
         
         self.pi_multiple = pi_multiple
-        #remove duplicates first
-        #simplify each sqrt component
+
         #remove duplicate square root components again which is important
 
         sqrt_components = removeDuplicatesInSqrtComponents(sqrt_components)
 
+        #remove non-whole number sqrts
+        for r in sqrt_components:
+            if r[1] % 1 != frac(0):
+                self.real+=r[0]*xmath.sqrt(r[1])
+                sqrt_components.remove(r)
+
         #simplify fully
         for r in sqrt_components:
             if r[1] < 0:
+                #convert negative perfect squares to terms of i
+                #and convert negative non-perfect squares to approximate terms of i
                 imaginary += r[0] * xmath.sqrt(abs(r[1]))
-            elif xmath.sqrt(r[1]) % 1 == frac(0):
                 sqrt_components.remove(r)
+            elif xmath.sqrt(r[1]) % 1 == frac(0):
                 self.real+=xmath.sqrt(r[1])*r[0]
+                sqrt_components.remove(r)
             else:
                 for factor_root in range(int(math.sqrt(r[1])), 1, -1):
                     factor = factor_root ** 2
@@ -49,7 +57,6 @@ class NumericalComponent:
                         sqrt_components.append([frac(factor_root)*r[0],frac(reduced)])
 
         self.imaginary = imaginary
-        sqrt_components = removeDuplicatesInSqrtComponents(sqrt_components)
 
         self.sqrt_components = removeDuplicatesInSqrtComponents(sqrt_components)
         #each sqrt component is laid out as [multiple,value]
@@ -208,16 +215,19 @@ def c_ln(x):
     return c_log(x)
 
 def c_sqrt(x):
+    if x.imaginary == frac(0) and x.pi_multiple == frac(0) and len(x.sqrt_components) == 0:
+        return NumericalComponent(sqrt_components=[[frac(1),frac(x.real)]])
+
     return x**.5
 
 def c_factorial(x:NumericalComponent):
     if x.imaginary != 0 or x.pi_multiple != 0 or len(x.sqrt_components) > 0: raise TypeError
-    if x.real % 1 == frac(0) and x.imaginary == 0:
+    if x.real % 1 == frac(0):
         return NumericalComponent(frac(math.factorial(int(x.real))))
     else:
         raise TypeError
     
-def c_choose(n,k):
+def c_choose(n:NumericalComponent,k:NumericalComponent):
     return c_factorial(n) / ( c_factorial(k) * c_factorial(n-k))
 
 # trig functions
@@ -321,10 +331,19 @@ c = NumericalComponent(Fraction(3,2),Fraction(6,7))
 f = lambda x: x**frac(2) - frac(4)*x
 g = lambda x: (x-frac(3))*(x+frac(5))*(x+frac(7))
 
+print("Printing Number:")
 print(c)
 
+print("Choose function:")
 print(c_choose(NumericalComponent(3),NumericalComponent(4)))
 
-print(NumericalComponent(frac(5),frac(5),frac(5),[[frac(5),frac(2)]])/NumericalComponent(imaginary=frac(4)))
+print("Division by imaginary value:")
+v = NumericalComponent(frac(5),frac(5),frac(5),[[frac(5),frac(2)]])/NumericalComponent(imaginary=frac(4))
+print(v,complex(v))
 
+print("Approximate Zero:")
 print(findRoot(g,Fraction(3.5),Fraction(4.5)))
+
+print("Square root:")
+print(c_sqrt(NumericalComponent(Fraction(3,5))))
+print(c_sqrt(NumericalComponent(-6)))

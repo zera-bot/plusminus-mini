@@ -1,0 +1,36 @@
+regular delimiters
+[Frac] {,} fraction
+[Power] {,} x^y
+[Mod] {,} x mod y
+[Sqrt] {} square root
+[NthRoot] {,} nth root
+[LogBase] {,} log_base
+[Log] {} log (base 10)
+[Ln] {} log (base e)
+[Factorial] {} Factorial
+[Choose] {,} nCr
+[W] {} lambert W
+
+[acos] {}
+[asin] {}
+[atan] {}
+[cos] {}
+[sin] {}
+[tan] {}
+
+[acosh] {}
+[asinh] {}
+[atanh] {}
+[cosh] {}
+[sinh] {}
+[tanh] {}
+
+standalone delimiters
+[Pi]
+[E]
+
+variables that can be used (do not count as delimiters)
+i
+x
+y
+z
