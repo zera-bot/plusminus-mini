@@ -1,11 +1,11 @@
-s = "[Frac]<3,[Frac]<6,7>>+4" #string
+s = "1+[Frac]<3,[Frac]<[Frac]<6+4,1>,7>>+4323" #string
 
 class NestedElementComponent():
     def __init__(self,index):
         self.index = index
 
     def __repr__(self):
-        return self.index
+        return "Nested Component "+str(self.index)
     
     def __int__(self):
         return self.index
@@ -48,6 +48,7 @@ def findOpenIndex(d:dict):
             k = d[str(n)]
             n+=1
         except: break
+    return str(n)
 
 def ssB(string,a,b):
     # get a substring between characters a and b of a string
@@ -61,7 +62,7 @@ def splitStringByNonNestedCommas(s):
     currentLiteral = ""
 
     bracketList = []
-    for ind,c in enumerate([*s]):
+    for c in [*s]:
         if c == "<": bracketList.append("<")
         elif c == ">": bracketList.append(">")
 
@@ -78,14 +79,28 @@ def splitStringByNonNestedCommas(s):
     if currentLiteral != "": l.append(currentLiteral)
     return l
 
+"""
+Exploring a nested list and pulling an element (no need to generate an ID because lists point to a
+reference in memory)
+"""
+def findFirstNestedElement(l):
+    if isinstance(l,list):
+        for i in l:
+            for jind,j in enumerate(i):
+                try: 
+                    if "[" in j: return i,jind
+                except TypeError:continue
+    elif isinstance(l,dict):
+        for k,v in l.items():
+            for ind,i in enumerate(v):
+                for jind,j in enumerate(i):
+                    try: 
+                        if "[" in j: return i,jind
+                    except TypeError:continue
+                
 
-
-def tokenize(s):
-    main = []
-    nests = {} #dict containing nested elements
-
+def miniTokenizeMain(s):
     miniMain = []
-    miniNests = {}
 
     currentLiteral = ""
     indexToSkipTo = -1
@@ -130,22 +145,49 @@ def tokenize(s):
         else:
             currentLiteral+=c
 
+        if currentLiteral != "":
+            miniMain.append(["OTHER",currentLiteral])
+        currentLiteral = ""
+
+    return miniMain
+
+
+def tokenize(s):
+    main = []
+    nests = {} #dict containing nested elements
+
+    miniMain = []
+    miniNests = {}
+
+    miniMain = miniTokenizeMain(s)
     # add current literal to end of list just in case there is a literal at the end
-    if currentLiteral != "":
-        miniMain.append(["OTHER",currentLiteral])
-    currentLiteral = ""
 
-    print(miniMain)
-
-            
+    #return miniMain
 
 
+    #Now we will move through each nested delimiter and add them to the miniNests dictionary.
+    while True:
+        if findFirstNestedElement(miniMain) == None: break
+        n,nind = findFirstNestedElement(miniMain)
 
+        availableDictionaryNum = findOpenIndex(miniNests)
+        nestedToken = miniTokenizeMain(n[nind])
 
+        n[nind]=NestedElementComponent(availableDictionaryNum)
+        miniNests[availableDictionaryNum]=nestedToken
 
+    #Do the same with miniNests.
+    while True:
+        if findFirstNestedElement(miniNests) == None: break
+        n,nind = findFirstNestedElement(miniNests)
 
+        availableDictionaryNum = findOpenIndex(miniNests)
+        nestedToken = miniTokenizeMain(n[nind])
 
+        n[nind]=NestedElementComponent(availableDictionaryNum)
+        miniNests[availableDictionaryNum]=nestedToken
+
+    print(miniMain,miniNests)
 
 
 print(tokenize(s))
-
