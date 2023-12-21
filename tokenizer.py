@@ -274,6 +274,15 @@ def parse(main,nests):
             if isinstance(v[j],str):
                 v[j]=parseSmallStatements(v[j])
 
+    mainWithoutNestedElements = []
+    mainWithNestedElements = []
+
+    nestsWithoutNestedElements = {}
+    nestsWithNestedElements = {}
+
+    #for i in main:
+
+
     # then, evaluate all delimiters in the parsedNests list that DON'T have a
     # NestedElementComponent item in one of their inputs
 
