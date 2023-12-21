@@ -28,9 +28,14 @@ regular delimiters
 standalone delimiters
 [Pi]
 [E]
+[i]
 
 variables that can be used (do not count as delimiters)
-i
 x
 y
 z
+
+non-delimiter operations
++ - * /
+
+33 total

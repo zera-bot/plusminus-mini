@@ -183,6 +183,9 @@ class NumericalComponent:
         r = " + ".join(s)
         return r.replace("+ -","- ")
 
+    #def __repr__(self):
+    #    return str(self)
+
     #other
 
     def __abs__(self):
@@ -321,29 +324,28 @@ def findRoot(f,a,b,iterations=4700): # range is [a,b]
         return None
     return NumericalComponent(Fraction(float(x_n)))
 
+def runTest():
+    a = NumericalComponent(frac(3),frac(4),frac(4),[[frac(2),frac(3)]])
+    b = NumericalComponent(frac(-1),frac(3),frac(-4),[[frac(2),frac(3)],[frac(4),frac(5)]])
 
+    c = NumericalComponent(Fraction(3,2),Fraction(6,7))
 
-a = NumericalComponent(frac(3),frac(4),frac(4),[[frac(2),frac(3)]])
-b = NumericalComponent(frac(-1),frac(3),frac(-4),[[frac(2),frac(3)],[frac(4),frac(5)]])
+    f = lambda x: x**frac(2) - frac(4)*x
+    g = lambda x: (x-frac(3))*(x+frac(5))*(x+frac(7))
 
-c = NumericalComponent(Fraction(3,2),Fraction(6,7))
+    print("Printing Number:")
+    print(c)
 
-f = lambda x: x**frac(2) - frac(4)*x
-g = lambda x: (x-frac(3))*(x+frac(5))*(x+frac(7))
+    print("Choose function:")
+    print(c_choose(NumericalComponent(3),NumericalComponent(4)))
 
-print("Printing Number:")
-print(c)
+    print("Division by imaginary value:")
+    v = NumericalComponent(frac(5),frac(5),frac(5),[[frac(5),frac(2)]])/NumericalComponent(imaginary=frac(4))
+    print(v,complex(v))
 
-print("Choose function:")
-print(c_choose(NumericalComponent(3),NumericalComponent(4)))
+    print("Approximate Zero:")
+    print(findRoot(g,Fraction(3.5),Fraction(4.5)))
 
-print("Division by imaginary value:")
-v = NumericalComponent(frac(5),frac(5),frac(5),[[frac(5),frac(2)]])/NumericalComponent(imaginary=frac(4))
-print(v,complex(v))
-
-print("Approximate Zero:")
-print(findRoot(g,Fraction(3.5),Fraction(4.5)))
-
-print("Square root:")
-print(c_sqrt(NumericalComponent(Fraction(3,5))))
-print(c_sqrt(NumericalComponent(-6)))
+    print("Square root:")
+    print(c_sqrt(NumericalComponent(Fraction(3,5))))
+    print(c_sqrt(NumericalComponent(-6)))
