@@ -28,14 +28,14 @@ class Variable:
 
     def __str__(self):
         return self.symbol
-    
+
     def __repr__(self):
         return str(self)
 
 class NumericalComponent:
     def __init__(self, real=frac(0), imaginary=frac(0), pi_multiple=frac(0), sqrt_components=[]):
         self.real = real
-        
+
         self.pi_multiple = pi_multiple
 
         #remove duplicate square root components again which is important
@@ -73,6 +73,12 @@ class NumericalComponent:
 
     # operators
 
+    def __pos__(self):
+        return self
+
+    def __neg__ (self):
+        return NumericalComponent(frac(-1))*self
+
     def __add__(self,other):
         sum = NumericalComponent(self.real+other.real,
                                   self.imaginary+other.imaginary,
@@ -108,7 +114,7 @@ class NumericalComponent:
 
         sum.sqrt_components=selfRoots
         return sum
-    
+
     def __mul__(self,other):
         mainSum = NumericalComponent(sqrt_components=[])
         approximateSum = NumericalComponent(sqrt_components=[])
@@ -136,7 +142,7 @@ class NumericalComponent:
             mainSum += NumericalComponent(sqrt_components=[[r[0]*other.real,r[1]]])
             approximateSum += NumericalComponent(imaginary= other.imaginary * ( r[0] * xmath.sqrt(r[1]) ),
                                                  pi_multiple= other.pi_multiple * ( r[0] * xmath.sqrt(r[1]) ))
-            
+
             for s in other.sqrt_components:
                 mainSum += NumericalComponent(sqrt_components=[[r[0]*s[0],r[1]*s[1]]])
 
@@ -175,7 +181,7 @@ class NumericalComponent:
             mainSum = self * (other**-1)
 
         return mainSum
-    
+
     def __pow__(self,other):
         val = complex(self) ** complex(other)
         return NumericalComponent(Fraction(val.real),Fraction(val.imag))
@@ -192,7 +198,7 @@ class NumericalComponent:
         if self.pi_multiple != frac(0): s.append(str(self.pi_multiple)+"pi")
         for r in self.sqrt_components:
             s.append(f"{r[0]}sqrt({r[1]})")
-        
+
         r = " + ".join(s)
         if r == "": r = "0"
         return r.replace("+ -","- ")
@@ -205,7 +211,7 @@ class NumericalComponent:
     def __abs__(self):
         k = complex(self)
         return NumericalComponent(xmath.sqrt(k.real**2 + k.imag**2))
-    
+
     def __complex__(self):
         v = complex(self.real+(xmath.pi*self.pi_multiple),self.imaginary)
         for w in self.sqrt_components:
@@ -222,7 +228,7 @@ class NumericalComponent:
     #    return not self.real == 0 and self.imaginary == 0 and self.pi_multiple == 0 and len(self.sqrt_components) == 0
 
 # library
-    
+
 def c_floor(x):
     x = complex(x)
     x = complex(math.floor(x.real),math.floor(x.imag))
@@ -254,7 +260,7 @@ def c_factorial(x:NumericalComponent):
         return NumericalComponent(frac(math.factorial(int(x.real))))
     else:
         raise TypeError
-    
+
 def c_choose(n:NumericalComponent,k:NumericalComponent):
     try:
         return c_factorial(n) / ( c_factorial(k) * c_factorial(n-k))
@@ -395,5 +401,3 @@ def runTest():
 
     print("Lambert W:")
     print(c_W(d))
-
-runTest()
