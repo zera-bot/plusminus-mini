@@ -22,6 +22,16 @@ def removeDuplicatesInSqrtComponents(components):
             distinct.append(c)
     return dc(distinct)
 
+class Variable:
+    def __init__(self,symbol:str):
+        self.symbol = symbol
+
+    def __str__(self):
+        return self.symbol
+    
+    def __repr__(self):
+        return str(self)
+
 class NumericalComponent:
     def __init__(self, real=frac(0), imaginary=frac(0), pi_multiple=frac(0), sqrt_components=[]):
         self.real = real
@@ -82,9 +92,9 @@ class NumericalComponent:
         return sum
 
     def __sub__(self,other):
-        sum = NumericalComponent(self.real+other.real,
-                                  self.imaginary+other.imaginary,
-                                  self.pi_multiple+other.pi_multiple)
+        sum = NumericalComponent(self.real-other.real,
+                                  self.imaginary-other.imaginary,
+                                  self.pi_multiple-other.pi_multiple)
         selfRoots = self.sqrt_components
 
         for root in other.sqrt_components:
@@ -170,6 +180,9 @@ class NumericalComponent:
         val = complex(self) ** complex(other)
         return NumericalComponent(Fraction(val.real),Fraction(val.imag))
 
+    def __mod__(self,other):
+        return self-other*(c_floor(self/other))
+
     #display
 
     def __str__(self):
@@ -181,16 +194,17 @@ class NumericalComponent:
             s.append(f"{r[0]}sqrt({r[1]})")
         
         r = " + ".join(s)
+        if r == "": r = "0"
         return r.replace("+ -","- ")
 
-    #def __repr__(self):
-    #    return str(self)
+    def __repr__(self):
+        return str(self)
 
     #other
 
     def __abs__(self):
         k = complex(self)
-        return xmath.sqrt(k.real**2 + k.imag**2)
+        return NumericalComponent(xmath.sqrt(k.real**2 + k.imag**2))
     
     def __complex__(self):
         v = complex(self.real+(xmath.pi*self.pi_multiple),self.imaginary)
@@ -208,8 +222,19 @@ class NumericalComponent:
     #    return not self.real == 0 and self.imaginary == 0 and self.pi_multiple == 0 and len(self.sqrt_components) == 0
 
 # library
+    
+def c_floor(x):
+    x = complex(x)
+    x = complex(math.floor(x.real),math.floor(x.imag))
+    return NumericalComponent(Fraction(x.real),Fraction(x.imag))
+
+def c_ceil(x):
+    x = complex(x)
+    x = complex(math.ceil(x.real),math.ceil(x.imag))
+    return NumericalComponent(Fraction(x.real),Fraction(x.imag))
 
 def c_log(x,base=xmath.e):
+    base = complex(base)
     y = complex(x)
     result = cmath.log(y,base)
     return NumericalComponent(Fraction(decimal.Decimal(result.real)),Fraction(decimal.Decimal(result.imag)))
@@ -224,14 +249,23 @@ def c_sqrt(x):
     return x**.5
 
 def c_factorial(x:NumericalComponent):
-    if x.imaginary != 0 or x.pi_multiple != 0 or len(x.sqrt_components) > 0: raise TypeError
-    if x.real % 1 == frac(0):
+    if not x.isOnlyRationalReal(): raise TypeError
+    if x.real % 1 == frac(0) and x.real >= 0:
         return NumericalComponent(frac(math.factorial(int(x.real))))
     else:
         raise TypeError
     
 def c_choose(n:NumericalComponent,k:NumericalComponent):
-    return c_factorial(n) / ( c_factorial(k) * c_factorial(n-k))
+    try:
+        return c_factorial(n) / ( c_factorial(k) * c_factorial(n-k))
+    except TypeError:
+        return NumericalComponent()
+
+def c_W(n:NumericalComponent):
+    c = ( n / ( NumericalComponent(frac(1)) + n) )
+    ans = c * ( ( NumericalComponent(frac(1)) + NumericalComponent(frac(2))*n ) / ( n + NumericalComponent(xmath.e)**(c) ) )
+    approxAns = complex(ans)
+    return NumericalComponent(Fraction(approxAns.real),Fraction(approxAns.imag))
 
 # trig functions
 
@@ -338,6 +372,8 @@ def runTest():
 
     print("Choose function:")
     print(c_choose(NumericalComponent(3),NumericalComponent(4)))
+    print(c_choose(NumericalComponent(3),NumericalComponent(3)))
+    print(c_choose(NumericalComponent(24),NumericalComponent(12)))
 
     print("Division by imaginary value:")
     v = NumericalComponent(frac(5),frac(5),frac(5),[[frac(5),frac(2)]])/NumericalComponent(imaginary=frac(4))
@@ -349,3 +385,15 @@ def runTest():
     print("Square root:")
     print(c_sqrt(NumericalComponent(Fraction(3,5))))
     print(c_sqrt(NumericalComponent(-6)))
+    print(c_sqrt(NumericalComponent(56)))
+
+    d = NumericalComponent(Fraction(1),Fraction(3))
+    e = NumericalComponent(Fraction(4),Fraction(5))
+
+    print("Modulo:")
+    print(d%e)
+
+    print("Lambert W:")
+    print(c_W(d))
+
+runTest()

@@ -61,6 +61,11 @@ def backspace(string,cursor):
         string = string[:cursor]+string[cursor+1:]
         return string,cursor
 
+def addDelimiter(string,cursor,delimName,numberOfParameters=1):
+    delimString = f"[{delimName}]<"+"".join(["," for k in range(numberOfParameters-1)])+">"
+    string = string[:cursor]+delimString+string[cursor:]
+    cursor+=len(delimName)+3
+    return string,cursor
 
 print(render(s,c))
 s,c = incrementCursorRight(s,c)
@@ -68,4 +73,6 @@ print(render(s,c))
 s,c = incrementCursorLeft(s,c)
 print(render(s,c))
 s,c = backspace(s,c)
+print(render(s,c))
+s,c = addDelimiter(s,c,"Frac",2)
 print(render(s,c))

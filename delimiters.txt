@@ -10,6 +10,8 @@ regular delimiters
 [Factorial] {} Factorial
 [Choose] {,} nCr
 [W] {} lambert W
+[Floor] {}
+[Ceil] {}
 
 [acos] {}
 [asin] {}
@@ -38,4 +40,4 @@ z
 non-delimiter operations
 + - * /
 
-33 total
+35 total

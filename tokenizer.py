@@ -2,8 +2,10 @@ import xmath,re,copy
 
 from comp import NumericalComponent
 from fractions import Fraction
+from delimiters import lambdas
 
-s = "123+[Frac]<3,[Frac]<[Frac]<6+4,1>,7>>+4323" #string
+#s = "123+[Frac]<3,[Frac]<[Frac]<6+4,1>,7>>+4323" #string
+s = "3-4[Frac]<3,4>"
 
 class NestedElementComponent():
     def __init__(self,index):
@@ -11,7 +13,7 @@ class NestedElementComponent():
 
     def __repr__(self):
         return "Nested Component "+str(self.index)
-    
+
     def __int__(self):
         return self.index
 
@@ -102,7 +104,6 @@ def findFirstNestedElement(l):
                     try: 
                         if "[" in j: return i,jind
                     except TypeError:continue
-                
 
 def miniTokenizeMain(s:str):
     main = []
@@ -141,7 +142,7 @@ def miniTokenizeMain(s:str):
                 if "<" in bracketList and ">" in bracketList:
                     bracketList.remove("<")
                     bracketList.remove(">")
-            
+
             #delimiterInputsString is the stuff inside the triangle brackets
             delmiterInputsString = ssB(s,inputsStartingInd+1,inputsEndingInd)
 
@@ -157,9 +158,19 @@ def miniTokenizeMain(s:str):
     return main
 
 def tokenize(s):
+    s = s.replace(" ","")
     s = s.replace("[Pi]","~pi")
     s = s.replace("[E]","~e")
     s = s.replace("[i]","~i")
+
+    s = s.replace("[X]","[X]< >")
+    s = s.replace("[Y]","[Y]< >")
+    s = s.replace("[Z]","[Z]< >")
+
+    s = s.replace("*-","*NumericalComponent(Fraction(\"-1,1\"))*")
+    s = s.replace("/-","*NumericalComponent(Fraction(\"-1,1\"))/")
+    s = s.replace("+-","-")
+
 
     main = []
     nests = {} #dict containing nested elements
@@ -201,7 +212,7 @@ def tokenize(s):
             for _ in range(ind+1,endingInd):
                 try: del main[ind+1]
                 except: pass
-            
+
             main[ind][1] = currentLiteral
             #do the funny
 
@@ -221,7 +232,7 @@ def convertStringToLiteral(s:str):
         return NumericalComponent(Fraction(s.replace("~e",""))*xmath.e,"real")
     else:
         return NumericalComponent(Fraction(s))
-    
+
 def parseSmallStatements(s:str):
     """
     !WARNING! Uses eval().
@@ -256,8 +267,8 @@ Delimiters will be parsed at the base level by the parse function.
 """
 def parse(main,nests):
     parsedMain = copy.deepcopy(main)
-    parsedNests = nests
-    
+    parsedNests = copy.deepcopy(nests)
+
     for ind,i in enumerate(parsedMain):
         #parse all small statements first
         if i[0] == "OTHER" and len(re.findall(r"[\+\-\*\/]",i[1])) == 0:
@@ -274,29 +285,74 @@ def parse(main,nests):
             if isinstance(v[j],str):
                 v[j]=parseSmallStatements(v[j])
 
-    mainWithoutNestedElements = []
-    mainWithNestedElements = []
+    nestsWithoutNestedElements = []
+    nestsWithNestedElements = []
 
-    nestsWithoutNestedElements = {}
-    nestsWithNestedElements = {}
-
-    #for i in main:
-
+    for k,v in parsedNests.items():
+        if v[0] == "DELIM":
+            containsNestedElements = False
+            for j in v:
+                if isinstance(j,NestedElementComponent):
+                    nestsWithNestedElements.append((k,v))
+                    containsNestedElements = True
+                    break
+            if not containsNestedElements:
+                nestsWithoutNestedElements.append((k,v))
 
     # then, evaluate all delimiters in the parsedNests list that DON'T have a
     # NestedElementComponent item in one of their inputs
+    if len(parsedNests) > 0:
+        for key,v in nestsWithoutNestedElements:
+            name = v[1]
+            value = lambdas[name](*v[2:])
+            parsedNests[key] = value
 
     # then, evaluate all delimiters in the parsedNests list that DO have a
-    # NestedElementComponent item in one of their inputs
-
+    # NestedElementComponent item in one of their inputs (in reversed order)
+    if len(nestsWithNestedElements) > 0:
+        for key,v in reversed(nestsWithNestedElements):
+            for cind,component in enumerate(v[2:]):
+                if isinstance(component,NestedElementComponent):
+                    #print(parsedNests[key][cind+2])
+                    v[cind+2] = parsedNests[component.index]
+            
+            name = v[1]
+            value = lambdas[name](*v[2:])
+            parsedNests[key] = value
+            
     # then, replace all NestedElementComponent in the parsedMain list with the
     # evaluated ones
+    for i in parsedMain:
+        if not isinstance(i,list): continue
+        for cind,component in enumerate(i[2:]):
+            if isinstance(component,NestedElementComponent):
+                i[cind+2] = parsedNests[component.index]
                 
     # then, evaluate all delimiters in the parsedMain list
-                
+    for ind,i in enumerate(parsedMain):
+        if isinstance(i,list) and i[0] == "DELIM":
+            name = i[1]
+            value = lambdas[name](*i[2:])
+            parsedMain[ind] = value
+            
     # finally use the operators (+ - * /) to parse the expression using eval()
-                
-    return parsedMain,parsedNests
-    
+    finalString = ""
+    for ind,i in enumerate(parsedMain):
+        if isinstance(i,NumericalComponent):
+            real = "Fraction(\""+str(i.real.numerator)+"/"+str(i.real.denominator)+"\")"
+            imag = "Fraction(\""+str(i.imaginary.numerator)+"/"+str(i.imaginary.denominator)+"\")"
+            pi_mul = "Fraction(\""+str(i.pi_multiple.numerator)+"/"+str(i.pi_multiple.denominator)+"\")"
+            sqrt_components = str([["Fraction(\""+str(k[0])+"/"+str(k[0])+")","Fraction("+str(k[1])+"/"+str(k[1])+"\")"] for k in i.sqrt_components])
+        
+            num = "NumericalComponent(real="+real+",imaginary="+imag+",pi_multiple="+pi_mul+",sqrt_components="+sqrt_components+")"
+            finalString+=num
+
+            if ind+1<len(parsedMain) and isinstance(parsedMain[ind+1],NumericalComponent):
+                # maybe check if this is correct, this handles implied multiplication
+                finalString+="*"
+        elif isinstance(i,list): #operator
+            finalString+=i[1]
+            
+    return eval(finalString)
 
 print(parse(*tokenize(s)))
