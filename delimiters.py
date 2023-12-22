@@ -32,3 +32,36 @@ lambdas = {
     "Y": lambda x: Variable("y"),
     "Z": lambda x: Variable("z"),
 }
+
+numbersOfParameters = {
+    "Frac": 2,
+    "Power": 2,
+    "Mod": 2,
+    "Sqrt": 1,
+    "NthRoot": 2,
+    "LogBase": 2,
+    "Ln": 1,
+    "Factorial": 1,
+    "Choose": 2,
+    "W": 1,
+    "Floor": 1,
+    "Ceil": 1,
+
+    "acos": 1,
+    "asin": 1,
+    "atan": 1,
+    "cos": 1,
+    "sin": 1,
+    "tan": 1,
+
+    "acosh": 1,
+    "asinh": 1,
+    "atanh": 1,
+    "cosh": 1,
+    "sinh": 1,
+    "tanh": 1,
+
+    "X": 1,
+    "Y": 1,
+    "Z": 1,
+}
