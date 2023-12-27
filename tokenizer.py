@@ -319,10 +319,8 @@ def parse(main, nests):
     #do the same for parsedNests
     #all delims
     for k, v in parsedNests.items():
-        if not isinstance(v[0],list): continue
-        if isinstance(v,list): # very important
+        if isinstance(v,list) and isinstance(v[0],list): # very important
             newParsedNests = copy.deepcopy(parsedNests)
-            #get all parsed nests values that it uses
             del newParsedNests[k]
 
             parsedNests[k]=["DELIM","Paren",parse(v,newParsedNests)]
@@ -375,7 +373,6 @@ def parse(main, nests):
     # then, evaluate all delimiters in the parsedMain list
     for ind, i in enumerate(parsedMain):
         if isinstance(i, list) and i[0] == "DELIM":
-            print(i)
             name = i[1]
             value = lambdas[name](*i[2:])
             parsedMain[ind] = value
@@ -416,10 +413,28 @@ def parse(main, nests):
         elif isinstance(i, list):  #operator
             finalString += i[1]
 
-    print(finalString)
     return eval(finalString)
 
+def tortureTest():
+    l = [r"[Power]<2,[Power]<2,2>>",
+         r"[Frac]<[acos]<1>+[Frac]<3,1>,[Ln]<4>>",
+         r"[Sqrt]<1+[Sqrt]<1+[Sqrt]<1+[Sqrt]<1+1>>>>",
+         r"[Frac]<[Frac]<5,4>,[Frac]<6,4>+[Frac]<1,3>>",
+         r"[NthRoot]<4,[Power]<2,[Power]<2,2>>>",
+         r"3*-4",
+         r"3.5/-3",
+         r"[Paren]<4>/0.5",
+         r"[Sqrt]<3>+[Sqrt]<9>",
+         r"2[Sqrt]<3>-[Sqrt]<3>",
+         r"[Frac]<7+2[Paren]<4+2>,3>",
+         r"[Sqrt]<[Pi]>",
+         #complex
+         r"[i]",
+         r"[Sqrt]<[Power]<[i]+1,[i]>-1>",
+         r"[Sqrt]<[Power]<[i],2>+[Power]<1,2>>"
+         ]
 
-#print(parse(*tokenize(r"[Power]<2,[Power]<2,[Power]<2,2>>>")))
-#print(parse(*tokenize(r"[Frac]<[acos]<1>+[Frac]<3,1>,[Ln]<4>>")))
-#print(parse(*tokenize(r"[Sqrt]<1+[Sqrt]<1+[Sqrt]<1+[Sqrt]<1+1>>>>")))
+    for i in l:
+        print(str(parse(*tokenize(i))))
+
+tortureTest()

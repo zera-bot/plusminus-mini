@@ -29,17 +29,6 @@ def alignToBounds(l):
 
     return offsetPointList(l,-farthestPointInXDirection,-farthestPointInYDirection)
 
-def drawExpression(expression,size,path="image.png"):
-    if not (isinstance(expression,BaseExpression) or isinstance(expression,DelimiterExpression) or isinstance(expression,CombinedExpression)):
-        raise TypeError
-    img = Image.new("RGB",size,(255,255,255,255))
-    draw = ImageDraw.Draw(img)
-
-    for point in expression.points:
-        draw.point(point,(0,0,0,255))
-
-    img.save(path)
-
 class BaseExpression: #only store data for expressions
     def __init__(self,value,isSmall=False):
         #value is the given tokenized list.
@@ -315,9 +304,15 @@ then sort of combine those elements
 to represent the width and height of stuff I'll create a 
 class designed to calculate and store the components and width/height data
 """
+def replacePrincipalVariables(s):
+    s = s.replace("[Pi]","p")
+    s = s.replace("[i]","i")
+    s = s.replace("[E]","e")
+    return s
+
 def generate(expression:str=None,tokens=None,nestedTokens=None):
     if expression:
-        expression = expression.replace("pi","p")
+        expression = replacePrincipalVariables(expression)
         tokens,nestedTokens = tokenize(expression)
     else: #inputs are lists (THIS IS SO BAD LOL)
         for ind,i in enumerate(tokens):
@@ -325,16 +320,16 @@ def generate(expression:str=None,tokens=None,nestedTokens=None):
             for jind,j in enumerate(i):
                 if isinstance(i,str):
                     r = tokens[ind][jind]
-                    tokens[ind][jind]=r.replace("pi","p")
+                    tokens[ind][jind]=replacePrincipalVariables(r)
         for k,v in nestedTokens.items():
             if not isinstance(v,list): continue
             for ind,i in enumerate(v):
                 if isinstance(i,str):
-                    nestedTokens[k][ind]=nestedTokens[k][ind].replace("pi","p")
+                    nestedTokens[k][ind]=replacePrincipalVariables(nestedTokens[k][ind])
                 elif isinstance(i,list):
                      for jind,j in enumerate(i):
                         if isinstance(i,str):
-                            nestedTokens[k][ind][jind]=nestedTokens[k][ind][jind].replace("pi","p")
+                            nestedTokens[k][ind][jind]=replacePrincipalVariables(nestedTokens[k][ind][jind])
 
 
     currentOther = ""
@@ -446,7 +441,19 @@ def generate(expression:str=None,tokens=None,nestedTokens=None):
 
     return CombinedExpression(tokens)
     print(tokens,nestedTokens)
-        
+
+#drawing and testing (may be removed later)
+def drawExpression(expression,size,path="image.png"):
+    if not (isinstance(expression,BaseExpression) or isinstance(expression,DelimiterExpression) or isinstance(expression,CombinedExpression)):
+        raise TypeError
+    img = Image.new("RGB",size,(255,255,255,255))
+    draw = ImageDraw.Draw(img)
+
+    for point in expression.points:
+        draw.point(point,(0,0,0,255))
+
+    img.save(path)
+
 def tortureTest():
     l = [r"[Power]<a,2>[Power]<c,2>",
          r"[Frac]<a+[Power]<a,2>,l+1>",
@@ -463,7 +470,8 @@ def tortureTest():
          "[Power]<e,e>",
          "[Mod]<3,[Frac]<4,5>>",
          "[Abs]<[Floor]<[Ceil]<[Frac]<4,5>>>>",
-         "[Frac]<[acos]<3>+3[cos]<[Frac]<4,5>>,[Ln]<4>>"
+         "[Frac]<[acos]<3>+3[cos]<[Frac]<4,5>>,[Ln]<4>>",
+         "[Sqrt]<[Power]<i+1,i>-1>"
          ]
     
     for ind,m in enumerate(l):
