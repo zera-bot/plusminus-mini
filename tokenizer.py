@@ -5,7 +5,7 @@ from fractions import Fraction
 from delimiters import lambdas
 
 #s = "123+[Frac]<3,[Frac]<[Frac]<6+4,1>,7>>+4323" #string
-s = "-1"
+#s = "3+-1.5"
 
 
 class NestedElementComponent():
@@ -188,9 +188,9 @@ def tokenize(s):
     s = s.replace("[Y]", "[Y]< >")
     s = s.replace("[Z]", "[Z]< >")
 
-    s = s.replace("*-", "*NumericalComponent(Fraction(\"-1,1\"))*")
-    s = s.replace("/-", "*NumericalComponent(Fraction(\"-1,1\"))/")
-    s = s.replace("+-", "-")
+    #s = s.replace("*-", "*NumericalComponent(Fraction(\"-1,1\"))*")
+    #s = s.replace("/-", "*NumericalComponent(Fraction(\"-1,1\"))/")
+    #s = s.replace("+-", "-")
 
     main = []
     nests = {}  #dict containing nested elements
@@ -350,7 +350,6 @@ def parse(main, nests):
         for key, v in reversed(nestsWithNestedElements):
             for cind, component in enumerate(v[2:]):
                 if isinstance(component, NestedElementComponent):
-                    #print(parsedNests[key][cind+2])
                     v[cind + 2] = parsedNests[component.index]
 
             name = v[1]
@@ -407,4 +406,5 @@ def parse(main, nests):
     return eval(finalString)
 
 
-print(parse(*tokenize(s)))
+print(tokenize(r"[Frac]<3,[Power]<7,4>>"))
+print(parse(*tokenize(r"[Power]<2,[Power]<2,[Power]<2,2>>>")))
