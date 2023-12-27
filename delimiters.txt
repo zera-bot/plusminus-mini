@@ -3,15 +3,17 @@ regular delimiters
 [Power] {,} x^y
 [Mod] {,} x mod y
 [Sqrt] {} square root
-[NthRoot] {,} nth root
+[NthRoot] {,} nth root (first input is radical base)
 [LogBase] {,} log_base
 [Log] {} log (base 10)
 [Ln] {} log (base e)
 [Factorial] {} Factorial
+[Abs] {} absolute value
 [Choose] {,} nCr
 [W] {} lambert W
 [Floor] {}
 [Ceil] {}
+[Paren] {} parentheses
 
 [acos] {}
 [asin] {}

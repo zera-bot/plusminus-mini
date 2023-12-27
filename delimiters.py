@@ -9,10 +9,12 @@ lambdas = {
     "LogBase": lambda x,base: c_log(x,base),
     "Ln": lambda x: c_ln(x),
     "Factorial": lambda x: c_factorial(x),
+    "Abs": lambda x: abs(x),
     "Choose": lambda n,k: c_choose(n,k),
     "W": lambda x: c_W(x),
     "Floor": lambda x: c_floor(x),
     "Ceil": lambda x: c_ceil(x),
+    "Paren":lambda x: x, #parentheses
 
     "acos": lambda x: c_acos(x),
     "asin": lambda x: c_asin(x),
@@ -42,10 +44,12 @@ numbersOfParameters = {
     "LogBase": 2,
     "Ln": 1,
     "Factorial": 1,
+    "Abs": 1,
     "Choose": 2,
     "W": 1,
     "Floor": 1,
     "Ceil": 1,
+    "Paren": 1,
 
     "acos": 1,
     "asin": 1,
@@ -65,3 +69,7 @@ numbersOfParameters = {
     "Y": 1,
     "Z": 1,
 }
+
+functionDelimiters = ["Log","Ln","W","acos","asin","atan",
+                      "cos","sin","tan","acosh","asinh","atanh",
+                      "cosh","sinh","tanh"]

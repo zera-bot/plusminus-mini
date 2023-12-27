@@ -242,7 +242,8 @@ def tokenize(s):
 
     #un-nest the lists in the nested item dict
     for k, v in nests.items():
-        nests[k] = v[0]
+        if len(v)==1:
+            nests[k] = v[0]
 
     return main, nests
 
@@ -318,6 +319,13 @@ def parse(main, nests):
     #do the same for parsedNests
     #all delims
     for k, v in parsedNests.items():
+        if not isinstance(v[0],list): continue
+        if isinstance(v,list): # very important
+            newParsedNests = copy.deepcopy(parsedNests)
+            #get all parsed nests values that it uses
+            del newParsedNests[k]
+
+            parsedNests[k]=["DELIM","Paren",parse(v,newParsedNests)]
         for j in range(2, len(v)):
             if isinstance(v[j], str):
                 v[j] = parseSmallStatements(v[j])
@@ -367,6 +375,7 @@ def parse(main, nests):
     # then, evaluate all delimiters in the parsedMain list
     for ind, i in enumerate(parsedMain):
         if isinstance(i, list) and i[0] == "DELIM":
+            print(i)
             name = i[1]
             value = lambdas[name](*i[2:])
             parsedMain[ind] = value
@@ -386,10 +395,14 @@ def parse(main, nests):
                 i.imaginary.denominator) + "\")"
             pi_mul = "Fraction(\"" + str(i.pi_multiple.numerator) + "/" + str(
                 i.pi_multiple.denominator) + "\")"
-            sqrt_components = str([[
-                "Fraction(\"" + str(k[0]) + "/" + str(k[0]) + ")",
-                "Fraction(" + str(k[1]) + "/" + str(k[1]) + "\")"
-            ] for k in i.sqrt_components])
+            sqrt_components = "[" 
+            for k in i.sqrt_components:
+                sqrt_components+=f"[Fraction(\"{str(k[0])}/1\"),Fraction(\"{str(k[1])}/1\")]"
+            sqrt_components+="]"
+            #str([[
+            #    "Fraction(\"" + str(k[0]) + "/" + str(k[0]) + ")",
+            #    "Fraction(" + str(k[1]) + "/" + str(k[1]) + "\")"
+            #] for k in i.sqrt_components])
 
             num = "NumericalComponent(real=" + real + ",imaginary=" + imag + ",pi_multiple=" + pi_mul + ",sqrt_components=" + sqrt_components + ")"
             finalString += num
@@ -403,8 +416,10 @@ def parse(main, nests):
         elif isinstance(i, list):  #operator
             finalString += i[1]
 
+    print(finalString)
     return eval(finalString)
 
 
-print(tokenize(r"[Frac]<3,[Power]<7,4>>"))
-print(parse(*tokenize(r"[Power]<2,[Power]<2,[Power]<2,2>>>")))
+#print(parse(*tokenize(r"[Power]<2,[Power]<2,[Power]<2,2>>>")))
+#print(parse(*tokenize(r"[Frac]<[acos]<1>+[Frac]<3,1>,[Ln]<4>>")))
+#print(parse(*tokenize(r"[Sqrt]<1+[Sqrt]<1+[Sqrt]<1+[Sqrt]<1+1>>>>")))
