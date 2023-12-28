@@ -328,10 +328,31 @@ def parse(main, nests):
 
     #do the same for parsedNests
     #all delims
+    nestedTokenKeysThatScrewedUp = []
     for k, v in parsedNests.items():
         if isinstance(v,list) and isinstance(v[0],list): # very important
+
+            #remove all the unnecessary stuff
             newParsedNests = copy.deepcopy(parsedNests)
             del newParsedNests[k]
+            keysToRemove = []
+            for k1,v1 in newParsedNests.items():
+                if isinstance(v1,list):
+                    if isinstance(v1[0],list):
+                        for i in v1:
+                            for j in i:
+                                if isinstance(j,NestedElementComponent):
+                                    if not j.index == k:
+                                        keysToRemove.append(k1)
+                    else:
+                        for i in v1:
+                            if isinstance(i,NestedElementComponent):
+                                if not i.index == k:
+                                    keysToRemove.append(k1)
+            for k1 in keysToRemove:
+                try:
+                    del newParsedNests[k1]
+                except: pass
 
             parsedNests[k]=["DELIM","Paren",parse(v,newParsedNests)]
         for j in range(2, len(v)):
@@ -366,11 +387,15 @@ def parse(main, nests):
         for key, v in reversed(nestsWithNestedElements):
             for cind, component in enumerate(v[2:]):
                 if isinstance(component, NestedElementComponent):
-                    v[cind + 2] = parsedNests[component.index]
+                    try:
+                        v[cind + 2] = parsedNests[component.index]
+                    except:
+                        nestedTokenKeysThatScrewedUp.append(key)
 
-            name = v[1]
-            value = lambdas[name](*v[2:])
-            parsedNests[key] = value
+            if key not in nestedTokenKeysThatScrewedUp:
+                name = v[1]
+                value = lambdas[name](*v[2:])
+                parsedNests[key] = value
 
     # then, replace all NestedElementComponent in the parsedMain list with the
     # evaluated ones
@@ -378,7 +403,10 @@ def parse(main, nests):
         if not isinstance(i, list): continue
         for cind, component in enumerate(i[2:]):
             if isinstance(component, NestedElementComponent):
-                i[cind + 2] = parsedNests[component.index]
+                try:
+                    i[cind + 2] = parsedNests[component.index]
+                except:
+                    i[cind + 2] = removedTokensFromNested[component.index]
 
     # then, evaluate all delimiters in the parsedMain list
     for ind, i in enumerate(parsedMain):
@@ -426,7 +454,7 @@ def parse(main, nests):
     return eval(finalString)
 
 def tortureTest():
-    l = [r"[Power]<2,[Power]<2,2>>",
+    """r"[Power]<2,[Power]<2,2>>",
          r"[Frac]<[acos]<1>+[Frac]<3,1>,[Ln]<4>>",
          r"[Sqrt]<1+[Sqrt]<1+[Sqrt]<1+[Sqrt]<1+1>>>>",
          r"[Frac]<[Frac]<5,4>,[Frac]<6,4>+[Frac]<1,3>>",
@@ -445,7 +473,11 @@ def tortureTest():
          r"[i]",
          r"[Sqrt]<[Power]<[i]+1,[i]>-1>",
          r"[Sqrt]<[Power]<[i],2>+[Power]<1,2>>",
-         r"[NthRoot]<[Frac]<3,4>+[E],[Frac]<2[i],3>>"
+         r"[NthRoot]<[Frac]<3,4>+[E],[Frac]<2[i],3>>","""
+    l = [
+         r"[Frac]<[LogBase]<[Frac]<[Frac]<2+[Frac]<3,2>,5>,3>,[Frac]<3,[Frac]<1,2>>>,17>",
+         r"[Frac]<[LogBase]<[Frac]<[Frac]<2+[Frac]<3,2>,2+[Frac]<3,2*2+[cos]<4>+3>>,3>,[Frac]<3,[Frac]<1,1+[acos]<1>>>>,17>",
+         #"[Factorial]<[Frac]<2,[Frac]<3,[sin]<5>+3>>-[sin]<3>>"
          ]
 
     for i in l:

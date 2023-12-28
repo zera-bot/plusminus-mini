@@ -29,6 +29,13 @@ def alignToBounds(l):
 
     return offsetPointList(l,-farthestPointInXDirection,-farthestPointInYDirection)
 
+def isExpressionType(obj):
+    a = isinstance(obj,BaseExpression)
+    b = isinstance(obj,DelimiterExpression)
+    c = isinstance(obj,CombinedExpression)
+    if a or b or c: return True
+    return False
+
 class BaseExpression: #only store data for expressions
     def __init__(self,value,isSmall=False):
         #value is the given tokenized list.
@@ -261,26 +268,44 @@ class DelimiterExpression:
             
             width = self.inputs[0].width+other.width-2
             height = other.height+self.inputs[0].height-6
+        elif delim == "LogBase":
+            self.inputs[0] = self.inputs[0].setSize(True)
 
+            delimPoints = BaseExpression("log",self.isSmallExpression())
+            inputExpression = DelimiterExpression("Paren",[self.inputs[1]])
+            maxHeight = max([delimPoints.height,inputExpression.height])
+            
+            height = maxHeight
+            if maxHeight < math.floor((maxHeight-delimPoints.height)/2)+math.floor(delimPoints.height/2)+self.inputs[0].height:
+                height += math.ceil(delimPoints.height) + self.inputs[0].height + 3 - maxHeight
 
+            miniHeight = math.floor((maxHeight-delimPoints.height)/2)+math.floor(delimPoints.height/2)+3
+            height = self.inputs[0].height+miniHeight
 
+            offset=delimPoints.width+1
+            points+=offsetPointList(delimPoints.points,0,math.floor((maxHeight-delimPoints.height)/2))
+            
+            points+=offsetPointList(self.inputs[0].points,offset,math.floor((maxHeight-delimPoints.height)/2)+math.floor(delimPoints.height/2)+3)
+            offset+=self.inputs[0].width+1
 
-        # IDEA: for delimiters using words like sin,
-        # instead of inserting points from the raw table
-        # use the BaseExpression class and get the list of points from there
-        # as it will do all the hard work
+            points+=offsetPointList(inputExpression.points,offset,math.floor((maxHeight-inputExpression.height)/2))
+            offset+=inputExpression.width+1
 
+            width = offset
+        elif delim == "Factorial":
+            symbol = BaseExpression("!",self.isSmallExpression())
+            inputExpression = DelimiterExpression("Paren",self.inputs)
+            
+            height = max([symbol.height,inputExpression.height])
+            width = symbol.width+inputExpression.width+1 #1 for spacing
 
-
-
+            points+=offsetPointList(inputExpression.points,0,math.floor((height-inputExpression.height)/2))
+            points+=offsetPointList(symbol.points,inputExpression.width+1,math.floor((height-symbol.height)/2))
 
         self.width = width
         self.height = height
         self.points = points
-        # CALCULATE ALL POINTS IN THIS EXPRESSION SO IT CAN BE TREATED AS ITS OWN
-        # EXPRESSION INSTEAD OF RELYING ON POINTERS TO THE REAL EXPRESSIONS
 
-    #this doesnt work but do this later
     def setSize(self,isSmall):
         return DelimiterExpression(self.delim,[k.setSize(isSmall) for k in self.inputs])
     
@@ -389,16 +414,22 @@ def generate(expression:str=None,tokens=None,nestedTokens=None):
         if not isinstance(v,list): continue
         if not isinstance(v[0],list): continue
         if isinstance(v,list): # very important
-            #newParsedNests = {}
-            #get all parsed nests values that it uses
-            #for i in v:
-            #    if isinstance(i,NestedElementComponent):
-            #        key = i.index
-            #        newParsedNests[str(i)] = nestedTokens[str(i)]
-
             newParsedNests = deepcopy(nestedTokens)
-            #get all parsed nests values that it uses
             del newParsedNests[k]
+            keysToRemove = []
+            for k1,v1 in newParsedNests.items():
+                if isinstance(v1,list):
+                    for ind,i in enumerate(v1):
+                        if isinstance(i,NestedElementComponent):
+                            keysToRemove.append(k1)
+                    if isinstance(v1[0],list):
+                        for ind,i in enumerate(v1):
+                            if isinstance(i,NestedElementComponent):
+                                keysToRemove.append(k1)
+            for k1 in keysToRemove:
+                try:
+                    del newParsedNests[k1]
+                except: pass
 
             nestedTokens[k]=generate(tokens=v,nestedTokens=newParsedNests)
 
@@ -430,20 +461,26 @@ def generate(expression:str=None,tokens=None,nestedTokens=None):
 
             nestedTokens[key] = DelimiterExpression(v[1],updatedList[2:])
 
+    nestedTokenKeysThatScrewedUp=[]
     # then, evaluate all delimiters in the parsedNests list that DO have a
     # NestedElementComponent item in one of their inputs (in reversed order)
     if len(nestsWithNestedElements) > 0:
         for key, v in reversed(nestsWithNestedElements):
             for cind, component in enumerate(v[2:]):
                 if isinstance(component, NestedElementComponent):
-                    v[cind + 2] = nestedTokens[component.index]
+                    #print(nestedTokens)
+                    try: #i like to live life dangerously
+                        v[cind + 2] = nestedTokens[component.index]
+                    except:
+                        nestedTokenKeysThatScrewedUp.append(key)
 
             updatedList=v.copy()
             for ind,i in enumerate(updatedList[2:]):
                 if isinstance(i,str):
                     updatedList[2+ind]=BaseExpression(i)
 
-            nestedTokens[key] = DelimiterExpression(v[1],updatedList[2:])
+            if key not in nestedTokenKeysThatScrewedUp:
+                nestedTokens[key] = DelimiterExpression(v[1],updatedList[2:])
 
     # then, replace all NestedElementComponent in the parsedMain list with the
     # evaluated ones
@@ -466,7 +503,6 @@ def generate(expression:str=None,tokens=None,nestedTokens=None):
             tokens[ind]=BaseExpression(i)
 
     return CombinedExpression(tokens)
-    print(tokens,nestedTokens)
 
 #drawing and testing (may be removed later)
 def drawExpression(expression,size,path="image.png"):
@@ -503,6 +539,10 @@ def tortureTest():
          "[Paren]<[Frac]<[Frac]<2,3>,4>+[Frac]<5,2>>",
          "[NthRoot]<2,2i>",
          "[NthRoot]<[Frac]<3,4>+e,[Frac]<2i,3>>",
+         "[LogBase]<e,17>",
+         "[Frac]<[LogBase]<[Frac]<[Frac]<2+[Frac]<3,2>,2+[Frac]<3,2*2+[cos]<4>+3>>,3>,[Frac]<3,[Frac]<1,1+[acos]<1>>>>,17>",
+         "[Frac]<[LogBase]<[Frac]<[Frac]<2+[Frac]<3,2>,5>,3>,[Frac]<3,[Frac]<1,2>>>,17>",
+         "[Factorial]<[Frac]<2,[Frac]<3,[sin]<5>>>>"
          ]
     
     for ind,m in enumerate(l):
