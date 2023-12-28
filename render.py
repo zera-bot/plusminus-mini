@@ -235,6 +235,32 @@ class DelimiterExpression:
 
             points+=offsetPointList(delimPoints.points,0,math.floor((height-delimPoints.height)/2))
             points+=offsetPointList(inputExpression.points,delimPoints.width+1,math.floor((height-inputExpression.height)/2))
+        elif delim == "Choose":
+            longestInputSize = max([k.width for k in inputs])+4
+
+            points+=offsetPointList(inputs[0].points,math.floor((longestInputSize-inputs[0].width)/2),0)
+            points+=offsetPointList(inputs[1].points,math.floor((longestInputSize-inputs[1].width)/2),inputs[0].height+3)
+
+            width = longestInputSize
+            height = inputs[0].height + inputs[1].height + 3
+
+            self.width = width
+            self.height = height
+            self.points = points
+
+            k = DelimiterExpression("Paren",[CombinedExpression([self])])
+            points= k.points
+            width = k.width
+            height= k.height
+        elif delim == "NthRoot":
+            points+=self.inputs[0].points
+
+            other = DelimiterExpression("Sqrt",[inputs[1]])
+            points+=offsetPointList(other.points,self.inputs[0].width-2,
+                                    self.inputs[0].height-6) #not sure about values
+            
+            width = self.inputs[0].width+other.width-2
+            height = other.height+self.inputs[0].height-6
 
 
 
@@ -461,6 +487,8 @@ def tortureTest():
          r"a+[Frac]<1,a+[Frac]<1,a+[Frac]<1,a>>>",
          r"[Sqrt]<1+[Sqrt]<1+[Sqrt]<1+[Sqrt]<1+a>>>>",
          r"[Paren]<[Frac]<[Power]<d,2>,d[Power]<a,2>>+[Frac]<[Power]<d,2>,d[Power]<a,2>>>",
+         r"[Choose]<7,[Power]<2,2>+1>",
+         r"[Choose]<d,2>[Power]<a,2>[Power]<c,d-2>-[Frac]<1,1-a>[Frac]<1,1-[Power]<a,2>>",
 
          #unofficial
          "123[Frac]<3,[Frac]<[Frac]<6+4,1>,7>>+4323i",
@@ -471,7 +499,10 @@ def tortureTest():
          "[Mod]<3,[Frac]<4,5>>",
          "[Abs]<[Floor]<[Ceil]<[Frac]<4,5>>>>",
          "[Frac]<[acos]<3>+3[cos]<[Frac]<4,5>>,[Ln]<4>>",
-         "[Sqrt]<[Power]<i+1,i>-1>"
+         "[Sqrt]<[Power]<i+1,i>-1>",
+         "[Paren]<[Frac]<[Frac]<2,3>,4>+[Frac]<5,2>>",
+         "[NthRoot]<2,2i>",
+         "[NthRoot]<[Frac]<3,4>+e,[Frac]<2i,3>>",
          ]
     
     for ind,m in enumerate(l):

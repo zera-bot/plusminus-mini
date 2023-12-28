@@ -240,6 +240,28 @@ def tokenize(s):
             main[ind][1] = currentLiteral
             #do the funny
 
+    #do the same for lists in nests
+    for k,v in nests.items():
+        if isinstance(v,list) and isinstance(v[0],list):
+            for ind,i in enumerate(v):
+                if i[0] == "OTHER" and len(re.findall(r"[\+\-\*\/()]", i[1])) == 0:
+                    currentLiteral = ""
+                    endingInd = ind
+
+                    while endingInd < len(
+                            v) and v[endingInd][0] == "OTHER" and len(
+                                re.findall(r"[\+\-\*\/()]", v[endingInd][1])) == 0:
+                        currentLiteral += v[endingInd][1]
+                        endingInd += 1
+
+                    for _ in range(ind + 1, endingInd):
+                        try:
+                            del v[ind + 1]
+                        except:
+                            pass
+
+                    v[ind][1] = currentLiteral
+
     #un-nest the lists in the nested item dict
     for k, v in nests.items():
         if len(v)==1:
@@ -249,18 +271,6 @@ def tokenize(s):
 
 
 #main parsing
-
-
-def convertStringToLiteral(s: str):
-    if "~i" in s:  #imaginary number
-        return NumericalComponent(imaginary=Fraction(s.replace("~i", "")))
-    elif "~pi" in s:  #pi multiple
-        return NumericalComponent(pi_multiple=Fraction(s.replace("~pi", "")))
-    elif "~e" in s:
-        return NumericalComponent(Fraction(s.replace("~e", "")) * xmath.e)
-    else:
-        return NumericalComponent(Fraction(s))
-
 
 def parseSmallStatements(s: str):
     """
@@ -428,10 +438,14 @@ def tortureTest():
          r"2[Sqrt]<3>-[Sqrt]<3>",
          r"[Frac]<7+2[Paren]<4+2>,3>",
          r"[Sqrt]<[Pi]>",
+         r"[Paren]<[Frac]<[Frac]<2,3>,4>+[Frac]<5,2>>",
+         r"[Choose]<7,[Power]<2,2>+1>",
+         r"2+[Pi]",
          #complex
          r"[i]",
          r"[Sqrt]<[Power]<[i]+1,[i]>-1>",
-         r"[Sqrt]<[Power]<[i],2>+[Power]<1,2>>"
+         r"[Sqrt]<[Power]<[i],2>+[Power]<1,2>>",
+         r"[NthRoot]<[Frac]<3,4>+[E],[Frac]<2[i],3>>"
          ]
 
     for i in l:
