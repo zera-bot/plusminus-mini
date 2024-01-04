@@ -1,7 +1,7 @@
 import renderformats
 import math
 from delimiters import functionDelimiters
-from tokenizer import tokenize,NestedElementComponent
+from tokenizer import tokenize
 from copy import deepcopy
 
 from PIL import Image,ImageDraw
@@ -361,147 +361,82 @@ def replacePrincipalVariables(s):
     s = s.replace("[E]","e")
     return s
 
-def generate(expression:str=None,tokens=None,nestedTokens=None):
+def replacePrincipalVariablesInList(l):
+    newL = deepcopy(l)
+    for ind,i in enumerate(newL):
+        if isinstance(i,list):
+            newL[ind] = replacePrincipalVariablesInList(i)
+        elif isinstance(i,str):
+            newL[ind] = replacePrincipalVariables(i)
+    return newL
+
+
+def generate(expression:str=None,tokens=None):
     if expression:
         expression = replacePrincipalVariables(expression)
-        tokens,nestedTokens = tokenize(expression)
+        tokens = tokenize(expression)
     else: #inputs are lists (THIS IS SO BAD LOL)
-        for ind,i in enumerate(tokens):
-            #if i:
-            for jind,j in enumerate(i):
-                if isinstance(i,str):
-                    r = tokens[ind][jind]
-                    tokens[ind][jind]=replacePrincipalVariables(r)
-        for k,v in nestedTokens.items():
-            if not isinstance(v,list): continue
-            for ind,i in enumerate(v):
-                if isinstance(i,str):
-                    nestedTokens[k][ind]=replacePrincipalVariables(nestedTokens[k][ind])
-                elif isinstance(i,list):
-                     for jind,j in enumerate(i):
-                        if isinstance(i,str):
-                            nestedTokens[k][ind][jind]=replacePrincipalVariables(nestedTokens[k][ind][jind])
+        tokens = replacePrincipalVariablesInList(tokens)
 
+    #combine elements
+    def v0(l):
+        newL = deepcopy(l)
 
-    currentOther = ""
-    firstCurrentOtherIndex = 0
+        currentOther = ""
+        firstCurrentOtherIndex = 0
 
-    indicesToDelete = []
-    for ind,t in enumerate(tokens):
-        if t[0] == "OTHER":
-            if currentOther == "": firstCurrentOtherIndex = ind
-            currentOther += t[1]
-        elif t[0] == "DELIM":
-            if currentOther != "":
-                tokens[firstCurrentOtherIndex]=currentOther
-                currentOther = ""
+        indicesToDelete = []
+        for ind,t in enumerate(newL):
+            if t[0] == "OTHER":
+                if currentOther == "": firstCurrentOtherIndex = ind
+                currentOther += t[1]
+            elif t[0] == "DELIM":
+                if currentOther != "":
+                    #remove the current literal
+                    newL[firstCurrentOtherIndex]=currentOther
+                    currentOther = ""
 
-                for i in range(firstCurrentOtherIndex+1,ind):
-                    indicesToDelete.append(i)
-    if currentOther != "":
-        tokens[firstCurrentOtherIndex]=currentOther
-        for i in range(firstCurrentOtherIndex+1,len(tokens)):
-            indicesToDelete.append(i)
+                    for i in range(firstCurrentOtherIndex+1,ind):
+                        indicesToDelete.append(i)
+                    
+                #evaluate delimiter
+                for jind,j in enumerate(t[2:]):
+                    if isinstance(j,list):
+                        t[jind+2] = v0(t[jind+2])
 
-    for i in reversed(indicesToDelete):
-        try:
-            del tokens[i]
-        except IndexError:
-            pass
+        if currentOther != "":
+            newL[firstCurrentOtherIndex]=currentOther
+            for i in range(firstCurrentOtherIndex+1,len(newL)):
+                indicesToDelete.append(i)
 
-    #important step
-    for k, v in nestedTokens.items():
-        if not isinstance(v,list): continue
-        if not isinstance(v[0],list): continue
-        if isinstance(v,list): # very important
-            newParsedNests = deepcopy(nestedTokens)
-            del newParsedNests[k]
-            keysToRemove = []
-            for k1,v1 in newParsedNests.items():
-                if isinstance(v1,list):
-                    for ind,i in enumerate(v1):
-                        if isinstance(i,NestedElementComponent):
-                            keysToRemove.append(k1)
-                    if isinstance(v1[0],list):
-                        for ind,i in enumerate(v1):
-                            if isinstance(i,NestedElementComponent):
-                                keysToRemove.append(k1)
-            for k1 in keysToRemove:
-                try:
-                    del newParsedNests[k1]
-                except: pass
-
-            nestedTokens[k]=generate(tokens=v,nestedTokens=newParsedNests)
-
-    #now start
+        for i in reversed(indicesToDelete):
+            try:
+                del newL[i]
+            except IndexError: pass
+        return newL
     
-    nestsWithoutNestedElements = []
-    nestsWithNestedElements = []
+    tokens = v0(tokens)
 
-    for k, v in nestedTokens.items():
-        if not isinstance(v,list): continue
-        if v[0] == "DELIM":
-            containsNestedElements = False
-            for j in v:
-                if isinstance(j, NestedElementComponent):
-                    nestsWithNestedElements.append((k, v))
-                    containsNestedElements = True
-                    break
-            if not containsNestedElements:
-                nestsWithoutNestedElements.append((k, v))
+    #convert all to expressions
+    def doItem(l):
+        newL = deepcopy(l)
+        for ind, i in enumerate(newL):
+            if isinstance(i, list) and i[0] == "DELIM":
+                updatedList = i.copy()
+                for jind,j in enumerate(updatedList[2:]):
+                    if isinstance(j,str):
+                        updatedList[2+jind]=BaseExpression(j)
+                    if isinstance(j,list):
+                        updatedList[2+jind]=generate(tokens=j)
+                newL[ind] = DelimiterExpression(i[1],updatedList[2:])
+            elif isinstance(i,str): # if its a base expression
+                newL[ind]=BaseExpression(i)
+            elif isinstance(i,list):
+                newL[ind]=generate(tokens=i)
 
-    # then, create a base expresion for
-    # all delimiters in the parsedNests list that DON'T have a
-    # NestedElementComponent item in one of their inputs
-    if len(nestedTokens) > 0:
-        for key, v in nestsWithoutNestedElements: #for each delim
-            updatedList = v.copy()
-            for ind,i in enumerate(updatedList[2:]):
-                updatedList[2+ind]=BaseExpression(i)
+        return newL
 
-            nestedTokens[key] = DelimiterExpression(v[1],updatedList[2:])
-
-    nestedTokenKeysThatScrewedUp=[]
-    # then, evaluate all delimiters in the parsedNests list that DO have a
-    # NestedElementComponent item in one of their inputs (in reversed order)
-    if len(nestsWithNestedElements) > 0:
-        for key, v in reversed(nestsWithNestedElements):
-            for cind, component in enumerate(v[2:]):
-                if isinstance(component, NestedElementComponent):
-                    #print(nestedTokens)
-                    try: #i like to live life dangerously
-                        v[cind + 2] = nestedTokens[component.index]
-                    except:
-                        nestedTokenKeysThatScrewedUp.append(key)
-
-            updatedList=v.copy()
-            for ind,i in enumerate(updatedList[2:]):
-                if isinstance(i,str):
-                    updatedList[2+ind]=BaseExpression(i)
-
-            if key not in nestedTokenKeysThatScrewedUp:
-                nestedTokens[key] = DelimiterExpression(v[1],updatedList[2:])
-
-    # then, replace all NestedElementComponent in the parsedMain list with the
-    # evaluated ones
-    for i in tokens:
-        if not isinstance(i, list): continue
-        for cind, component in enumerate(i[2:]):
-            if isinstance(component, NestedElementComponent):
-                i[cind + 2] = nestedTokens[component.index]
-
-    #do main list
-    for ind, i in enumerate(tokens):
-        if isinstance(i, list) and i[0] == "DELIM":
-            updatedList = i.copy()
-            for jind,j in enumerate(updatedList[2:]):
-                if isinstance(j,str):
-                    updatedList[2+jind]=BaseExpression(j)
-
-            tokens[ind] = DelimiterExpression(i[1],updatedList[2:])
-        elif isinstance(i,str): # if its still a base expression
-            tokens[ind]=BaseExpression(i)
-
+    tokens = doItem(tokens)
     return CombinedExpression(tokens)
 
 #drawing and testing (may be removed later)
@@ -527,11 +462,12 @@ def tortureTest():
          r"[Choose]<d,2>[Power]<a,2>[Power]<c,d-2>-[Frac]<1,1-a>[Frac]<1,1-[Power]<a,2>>",
 
          #unofficial
+         "a",
          "123[Frac]<3,[Frac]<[Frac]<6+4,1>,7>>+4323i",
          "[Frac]<3,[Power]<7,4>>",
          "[Frac]<3,[Sqrt]<[Frac]<3,[Power]<7,4>>>>",
          "[Paren]<[Power]<7,4>>",
-         "[Power]<e,e>",
+         "[Power]<[E],[E]>",
          "[Mod]<3,[Frac]<4,5>>",
          "[Abs]<[Floor]<[Ceil]<[Frac]<4,5>>>>",
          "[Frac]<[acos]<3>+3[cos]<[Frac]<4,5>>,[Ln]<4>>",
@@ -542,7 +478,9 @@ def tortureTest():
          "[LogBase]<e,17>",
          "[Frac]<[LogBase]<[Frac]<[Frac]<2+[Frac]<3,2>,2+[Frac]<3,2*2+[cos]<4>+3>>,3>,[Frac]<3,[Frac]<1,1+[acos]<1>>>>,17>",
          "[Frac]<[LogBase]<[Frac]<[Frac]<2+[Frac]<3,2>,5>,3>,[Frac]<3,[Frac]<1,2>>>,17>",
-         "[Factorial]<[Frac]<2,[Frac]<3,[sin]<5>>>>"
+         "[Factorial]<[Frac]<2,[Frac]<3,[sin]<5>>>>",
+         "[Ln]<[Frac]<2,[Frac]<3,[sin]<5>+3>>-[sin]<3>>",
+         "[Sqrt]<[Frac]<3,4>-1>"
          ]
     
     for ind,m in enumerate(l):
