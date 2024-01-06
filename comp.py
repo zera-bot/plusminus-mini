@@ -76,7 +76,9 @@ class NumericalComponent:
 
         #simplify fully
         for r in sqrt_components:
-            if r[1] < 0:
+            if r[1] == 0:
+                sqrt_components.remove(r)
+            elif r[1] < 0:
                 #convert negative perfect squares to terms of i
                 #and convert negative non-perfect squares to approximate terms of i
                 imaginary += r[0] * xmath.sqrt(abs(r[1]))
@@ -220,6 +222,20 @@ class NumericalComponent:
         self,other = convertToNumericalComponent(self),convertToNumericalComponent(other)
         return self-other*(c_floor(self/other))
 
+    #binary operator
+
+    def __eq__(self,other):
+        self,other = convertToNumericalComponent(self),convertToNumericalComponent(other)
+        v0 = self.real == other.real
+        v1 = self.imaginary == other.imaginary
+        v2 = self.pi_multiple == other.pi_multiple
+
+        self.sqrt_components.sort()
+        other.sqrt_components.sort()
+        v3 = self.sqrt_components==other.sqrt_components
+
+        return v0 and v1 and v2 and v3
+
     #with incompatible types
 
     def __radd__(self,other):
@@ -239,6 +255,9 @@ class NumericalComponent:
     
     def __rmod__(self,other):
         return convertToNumericalComponent(other)%convertToNumericalComponent(self)
+
+    def __req__(self,other):
+        return convertToNumericalComponent(self) == convertToNumericalComponent(other)
 
     #display
 
@@ -429,3 +448,14 @@ def tortureTest():
     print(NumericalComponent(imaginary=4)-1)
     print(1-NumericalComponent(imaginary=4))
     print(1/NumericalComponent(3))
+
+    print("Binary Operations:")
+    bo0 = NumericalComponent(sqrt_components=[[5,4],[2,3],[6,6]])
+    bo1 = NumericalComponent(sqrt_components=[[6,6],[2,3],[5,4]])
+
+    print(NumericalComponent(1)==1)
+    print(1==NumericalComponent(1))
+    print(bo0==bo1)
+    print(NumericalComponent(0,sqrt_components=[[80,0]])==0)
+
+tortureTest()
