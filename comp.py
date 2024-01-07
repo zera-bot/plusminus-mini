@@ -209,7 +209,25 @@ class NumericalComponent:
                     mainSum+=NumericalComponent(self.real/divisionValue, self.imaginary/divisionValue,
                     self.pi_multiple/divisionValue, [[k[0]/divisionValue,k[1]] for k in self.sqrt_components])
         else: #just approximate at this point
-            mainSum = self * (other**-1)
+            selfRealComponent = self.real
+            otherRealComponent = other.real
+
+            if self.pi_multiple != 0 or len(self.sqrt_components)>0:
+                selfRealComponent = complex(self).real
+            if other.pi_multiple != 0 or len(other.sqrt_components)>0:
+                otherRealComponent = complex(other).real
+
+            a = selfRealComponent
+            b = self.imaginary
+            c = otherRealComponent
+            d = other.imaginary
+
+            mainSum = NumericalComponent(
+                (a*c + b*d)/(c**2 + d**2),
+                (b*c - a*d)/(c**2 + d**2)
+            )
+            
+            #mainSum = self * (other**-1)
 
         return mainSum
 
@@ -427,6 +445,7 @@ def tortureTest():
     print("Division by imaginary value:")
     v = NumericalComponent(frac(5),frac(5),frac(5),[[frac(5),frac(2)]])/NumericalComponent(imaginary=frac(4))
     print(v,complex(v))
+    print(c/c)
 
     print("Square root:")
     print(c_sqrt(NumericalComponent(Fraction(3,5))))
@@ -456,3 +475,5 @@ def tortureTest():
     print(bo0==bo1)
     print(NumericalComponent(0,sqrt_components=[[80,0]])==0)
     print(NumericalComponent(sqrt_components=[[2,3]])==NumericalComponent(sqrt_components=[[3,2]]))
+
+tortureTest()

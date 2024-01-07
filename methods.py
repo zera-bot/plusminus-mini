@@ -113,7 +113,7 @@ def evaluateDefiniteIntegral(f,a,b):
     if a>b: return -evaluateDefiniteIntegral(f,b,a)
     if a == b: return NumericalComponent()
 
-    n = 100000 #1e6
+    n = 100000 #1e5
     dx = (b-a)/n
 
     sumLeft = NumericalComponent()
