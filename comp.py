@@ -407,8 +407,6 @@ def c_tanh(x):
     return NumericalComponent(Fraction(decimal.Decimal(result.real)),
                               Fraction(decimal.Decimal(result.imag)))
 
-
-
 def tortureTest():
     a = NumericalComponent(frac(3),frac(4),frac(4),[[frac(2),frac(3)]])
     b = NumericalComponent(frac(-1),frac(3),frac(-4),[[frac(2),frac(3)],[frac(4),frac(5)]])
@@ -457,5 +455,4 @@ def tortureTest():
     print(1==NumericalComponent(1))
     print(bo0==bo1)
     print(NumericalComponent(0,sqrt_components=[[80,0]])==0)
-
-tortureTest()
+    print(NumericalComponent(sqrt_components=[[2,3]])==NumericalComponent(sqrt_components=[[3,2]]))

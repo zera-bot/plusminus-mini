@@ -2,6 +2,8 @@ from comp import c_sqrt as sqrt
 from comp import NumericalComponent,frac
 from fractions import Fraction
 
+import xmath
+
 I = NumericalComponent(imaginary=Fraction(1))
 
 #tools
@@ -97,3 +99,31 @@ def linearRegression(points):
     rSquared = generateRSquared(expectedValue,pointsX,pointsY,sumy/n)
 
     return [b,a,rSquared] # f(x) = bx+a
+
+# calculus
+
+def evaluateDerivative(f,at):
+    def limitFunction(h):
+        return (f(at+h)-f(at))/h
+    
+    small = NumericalComponent(Fraction("0.0000000000001"))
+    return ( limitFunction(small)+limitFunction(-small) )/2
+
+def evaluateDefiniteIntegral(f,a,b):
+    if a>b: return -evaluateDefiniteIntegral(f,b,a)
+    if a == b: return NumericalComponent()
+
+    n = 100000 #1e6
+    dx = (b-a)/n
+
+    sumLeft = NumericalComponent()
+    sumRight = NumericalComponent()
+
+    #x_i = x_0 + i*dx
+    for i in range(1,n+1):
+        sumRight += f(a + i*dx)*dx
+
+    for i in range(n):
+        sumLeft += f(a + i*dx)*dx
+
+    return (sumLeft+sumRight)/2
