@@ -10,9 +10,12 @@ c = 0 # cursor
 def render(string,cursor):
     return string[:cursor]+"|"+string[cursor:]
 
+def isap(string,cursor,substring): #insert string at position
+    return string[:cursor]+substring+string[cursor:]
+
 def incrementCursorRight(string,cursor):
     cursor+=1
-    if cursor > len(string)-1: cursor = 0
+    if cursor >= len(string): cursor = 0
     if cursor != 0 and string[cursor-1] == "[":
         while s[cursor-1] != "<": cursor+=1
     return string,cursor
@@ -67,7 +70,7 @@ def addDelimiter(string,cursor,delimName,numberOfParameters=1):
     cursor+=len(delimName)+3
     return string,cursor
 
-print(render(s,c))
+"""print(render(s,c))
 s,c = incrementCursorRight(s,c)
 print(render(s,c))
 s,c = incrementCursorLeft(s,c)
@@ -75,4 +78,4 @@ print(render(s,c))
 s,c = backspace(s,c)
 print(render(s,c))
 s,c = addDelimiter(s,c,"Frac",2)
-print(render(s,c))
+print(render(s,c))"""

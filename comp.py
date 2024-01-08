@@ -76,7 +76,7 @@ class NumericalComponent:
 
         #simplify fully
         for r in sqrt_components:
-            if r[1] == 0:
+            if r[1] == 0 or r[0] == 0:
                 sqrt_components.remove(r)
             elif r[1] < 0:
                 #convert negative perfect squares to terms of i
@@ -93,7 +93,8 @@ class NumericalComponent:
                         reduced = r[1] // factor
                         sqrt_components.remove(r)
                         sqrt_components.append([frac(factor_root)*r[0],frac(reduced)])
-
+                        break
+                        
         self.imaginary = imaginary
         self.sqrt_components = removeDuplicatesInSqrtComponents(sqrt_components)
         #each sqrt component is laid out as [multiple,value]
@@ -337,8 +338,9 @@ def c_ln(x):
     return c_log(x)
 
 def c_sqrt(x):
+    x = convertToNumericalComponent(x)
     if x.imaginary == frac(0) and x.pi_multiple == frac(0) and len(x.sqrt_components) == 0:
-        return NumericalComponent(sqrt_components=[[frac(1),frac(x.real)]])
+        return NumericalComponent(sqrt_components=[[frac(1),x.real]])
 
     return x**.5
 
@@ -475,5 +477,3 @@ def tortureTest():
     print(bo0==bo1)
     print(NumericalComponent(0,sqrt_components=[[80,0]])==0)
     print(NumericalComponent(sqrt_components=[[2,3]])==NumericalComponent(sqrt_components=[[3,2]]))
-
-tortureTest()

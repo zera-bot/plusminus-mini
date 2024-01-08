@@ -323,6 +323,8 @@ def tortureTest():
          r"[Paren]<[Frac]<[Frac]<2,3>,4>+[Frac]<5,2>>",
          r"[Choose]<7,[Power]<2,2>+1>",
          r"2+[Pi]",
+         r"3",
+         r"3+4",
          #complex
          r"[i][Pi]",
          r"[i][Pi][E]"

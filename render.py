@@ -1,6 +1,6 @@
 import renderformats
 import math
-from delimiters import functionDelimiters
+from delimiters import functionDelimiters,numbersOfParameters
 from tokenizer import tokenize
 from copy import deepcopy
 
@@ -38,7 +38,7 @@ def isExpressionType(obj):
 
 class BaseExpression: #only store data for expressions
     def __init__(self,value,isSmall=False):
-        #value is the given tokenized list.
+        if value == "": value = "q"
         self.value = value
         self.isSmall = isSmall
 
@@ -62,6 +62,10 @@ class BaseExpression: #only store data for expressions
 
 class DelimiterExpression:
     def __init__(self,delim,inputs):
+        expectedAmount = numbersOfParameters[delim]
+        for i in range(expectedAmount-len(inputs)):
+            inputs.append(BaseExpression("q"))
+
         self.delim = delim
         #below should be either of type DelimiterExpression or BaseExpression
         self.inputs = inputs 
@@ -487,5 +491,4 @@ def tortureTest():
         array = generate(m)
         drawExpression(array,(128,64),f"tortureTest/{str(ind+1)}.png")
 
-#mozilla torture test + other (current implementation)
-tortureTest()
+#mozilla torture test + other (current implementation) above
