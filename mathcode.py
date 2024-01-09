@@ -15,7 +15,7 @@ def isap(string,cursor,substring): #insert string at position
 
 def incrementCursorRight(string,cursor):
     cursor+=1
-    if cursor >= len(string): cursor = 0
+    if cursor > len(string): cursor = 0
     if cursor != 0 and string[cursor-1] == "[":
         while s[cursor-1] != "<": cursor+=1
     return string,cursor
