@@ -127,6 +127,8 @@ def renderUpdate(): #given the data state, renderUpdate() will update the screen
         pass #do later lmao
 
     currentScreen=totalPoints
+    #perhaps convert to list of 0s and 1s but idk save it for whenever i get the lcd
+    #physically display
 
 def updateScreen(action):
     global data,currentMode,currentScreen
@@ -304,7 +306,71 @@ def tortureTest():
 
     for ind,i in enumerate(tests):
         updateScreen(i)
-        renderUpdate()
         renderCurrentScreen(f"systemTortureTest/{str(ind+1)}.png")
+
+
+#replace these values with the real key inputs later
+equalsKey = "="
+rightKey = "right"
+leftKey = "left"
+menuKey = "menu"
+backspaceKey = "backspace"
+clearKey = "clear"
+
+delimInputs = {
+    "Frac": "Frac",
+    "Power": "Power",
+    "Mod": "Mod",
+    "Sqrt": "Sqrt",
+    "NthRoot": "NthRoot",
+    "LogBase": "LogBase",
+    "Ln": "Ln",
+    "Factorial": "Factorial",
+    "Abs": "Abs",
+    "Choose": "Choose",
+    "W": "W",
+    "Floor": "Floor",
+    "Ceil": "Ceil",
+    "Paren": "Paren",
+
+    "acos": "acos",
+    "asin": "asin",
+    "atan": "atan",
+    "cos": "cos",
+    "sin": "sin",
+    "tan": "tan",
+
+    "acosh": "acosh",
+    "asinh": "asinh",
+    "atanh": "atanh",
+    "cosh": "cosh",
+    "sinh": "sinh",
+    "tanh": "tanh",
+} # delimiters -- key is 
+typeInputs = [
+    "0","1","2","3","4","5","6","7","8","9",
+    "+","-","*","/","."
+    "e","p","i"
+]#single chars
+def parseInput(inp):
+    if inp in typeInputs:
+        updateScreen(["type",[inp]])
+    elif inp == equalsKey:
+        updateScreen(["enter",[]])
+    elif inp == backspaceKey:
+        updateScreen(["backspace",[]])
+    elif inp == menuKey:
+        updateScreen(["menu",[]])
+    elif inp == leftKey:
+        updateScreen(["cursor",["left"]])
+    elif inp == rightKey:
+        updateScreen(["cursor",["right"]])
+    elif inp == clearKey:
+        updateScreen(["clear",[]])
+
+    for key,v in delimInputs.items():
+        if inp == key:
+            updateScreen(["delim",[v]])
+    
 
 tortureTest()

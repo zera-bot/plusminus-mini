@@ -4,8 +4,6 @@ from delimiters import functionDelimiters,numbersOfParameters
 from tokenizer import tokenize
 from copy import deepcopy
 
-from PIL import Image,ImageDraw
-
 def generateArray(x,y):
     return [0 for _ in range(x*y)]
 
@@ -442,53 +440,3 @@ def generate(expression:str=None,tokens=None):
 
     tokens = doItem(tokens)
     return CombinedExpression(tokens)
-
-#drawing and testing (may be removed later)
-def drawExpression(expression,size,path="image.png"):
-    if not (isinstance(expression,BaseExpression) or isinstance(expression,DelimiterExpression) or isinstance(expression,CombinedExpression)):
-        raise TypeError
-    img = Image.new("RGB",size,(255,255,255,255))
-    draw = ImageDraw.Draw(img)
-
-    for point in expression.points:
-        draw.point(point,(0,0,0,255))
-
-    img.save(path)
-
-def tortureTest():
-    l = [r"[Power]<a,2>[Power]<c,2>",
-         r"[Frac]<a+[Power]<a,2>,l+1>",
-         r"[Frac]<a,c/2>",
-         r"a+[Frac]<1,a+[Frac]<1,a+[Frac]<1,a>>>",
-         r"[Sqrt]<1+[Sqrt]<1+[Sqrt]<1+[Sqrt]<1+a>>>>",
-         r"[Paren]<[Frac]<[Power]<d,2>,d[Power]<a,2>>+[Frac]<[Power]<d,2>,d[Power]<a,2>>>",
-         r"[Choose]<7,[Power]<2,2>+1>",
-         r"[Choose]<d,2>[Power]<a,2>[Power]<c,d-2>-[Frac]<1,1-a>[Frac]<1,1-[Power]<a,2>>",
-
-         #unofficial
-         "a",
-         "123[Frac]<3,[Frac]<[Frac]<6+4,1>,7>>+4323i",
-         "[Frac]<3,[Power]<7,4>>",
-         "[Frac]<3,[Sqrt]<[Frac]<3,[Power]<7,4>>>>",
-         "[Paren]<[Power]<7,4>>",
-         "[Power]<[E],[E]>",
-         "[Mod]<3,[Frac]<4,5>>",
-         "[Abs]<[Floor]<[Ceil]<[Frac]<4,5>>>>",
-         "[Frac]<[acos]<3>+3[cos]<[Frac]<4,5>>,[Ln]<4>>",
-         "[Sqrt]<[Power]<i+1,i>-1>",
-         "[Paren]<[Frac]<[Frac]<2,3>,4>+[Frac]<5,2>>",
-         "[NthRoot]<2,2i>",
-         "[NthRoot]<[Frac]<3,4>+e,[Frac]<2i,3>>",
-         "[LogBase]<e,17>",
-         "[Frac]<[LogBase]<[Frac]<[Frac]<2+[Frac]<3,2>,2+[Frac]<3,2*2+[cos]<4>+3>>,3>,[Frac]<3,[Frac]<1,1+[acos]<1>>>>,17>",
-         "[Frac]<[LogBase]<[Frac]<[Frac]<2+[Frac]<3,2>,5>,3>,[Frac]<3,[Frac]<1,2>>>,17>",
-         "[Factorial]<[Frac]<2,[Frac]<3,[sin]<5>>>>",
-         "[Ln]<[Frac]<2,[Frac]<3,[sin]<5>+3>>-[sin]<3>>",
-         "[Sqrt]<[Frac]<3,4>-1>"
-         ]
-    
-    for ind,m in enumerate(l):
-        array = generate(m)
-        drawExpression(array,(128,64),f"tortureTest/{str(ind+1)}.png")
-
-#mozilla torture test + other (current implementation) above

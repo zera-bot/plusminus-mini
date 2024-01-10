@@ -305,37 +305,3 @@ def parse(main):
             finalString += i[1]
 
     return eval(finalString)
-
-def tortureTest():
-    l = [
-         r"[Power]<2,[Power]<2,2>>",
-         r"[Frac]<[acos]<1>+[Frac]<3,1>,[Ln]<4>>",
-         r"[Sqrt]<1+[Sqrt]<1+[Sqrt]<1+[Sqrt]<1+1>>>>",
-         r"[Frac]<[Frac]<5,4>,[Frac]<6,4>+[Frac]<1,3>>",
-         r"[NthRoot]<4,[Power]<2,[Power]<2,2>>>",
-         r"3*-4",
-         r"3.5/-3",
-         r"[Paren]<4>/0.5",
-         r"[Sqrt]<3>+[Sqrt]<9>",
-         r"2[Sqrt]<3>-[Sqrt]<3>",
-         r"[Frac]<7+2[Paren]<4+2>,3>",
-         r"[Sqrt]<[Pi]>",
-         r"[Paren]<[Frac]<[Frac]<2,3>,4>+[Frac]<5,2>>",
-         r"[Choose]<7,[Power]<2,2>+1>",
-         r"2+[Pi]",
-         r"3",
-         r"3+4",
-         #complex
-         r"[i][Pi]",
-         r"[i][Pi][E]"
-         r"[Sqrt]<[Power]<[i]+1,[i]>-1>",
-         r"[Sqrt]<[Power]<[i],2>+[Power]<1,2>>",
-         r"[NthRoot]<[Frac]<3,4>+[E],[Frac]<2[i],3>>",
-         r"[Ln]<[Frac]<2,[Frac]<3,[sin]<5>+3>>-[sin]<3>>",
-         r"[Frac]<[LogBase]<[Frac]<[Frac]<2+[Frac]<3,2>,5>,3>,[Frac]<3,[Frac]<1,2>>>,17>",
-         r"[Frac]<[LogBase]<[Frac]<[Frac]<2+[Frac]<3,2>,2+[Frac]<3,2*2+[cos]<4>+3>>,3>,[Frac]<3,[Frac]<1,1+[acos]<1>>>>,17>",
-         r"[Power]<[E],[i][Pi]>+1"
-         ]
-
-    for i in l:
-        print(str(parse(tokenize(i))))

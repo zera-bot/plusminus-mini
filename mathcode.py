@@ -1,8 +1,8 @@
 import re
 
 #remove these two variables when done
-s = "[Frac]<3,a[Frac]<6,7>>" # string
-c = 0 # cursor
+#s = "[Frac]<3,a[Frac]<6,7>>" # string
+#c = 0 # cursor
 #char value n is BEFORE n'th character
 #char before cursor = cursor-1
 #char after cursor = cursor
@@ -17,7 +17,7 @@ def incrementCursorRight(string,cursor):
     cursor+=1
     if cursor > len(string): cursor = 0
     if cursor != 0 and string[cursor-1] == "[":
-        while s[cursor-1] != "<": cursor+=1
+        while string[cursor-1] != "<": cursor+=1
     return string,cursor
 
 def incrementCursorLeft(string,cursor):
