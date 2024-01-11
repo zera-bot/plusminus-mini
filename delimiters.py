@@ -70,6 +70,6 @@ numbersOfParameters = {
     "Z": 1,
 }
 
-functionDelimiters = ["Log","Ln","W","acos","asin","atan",
+functionDelimiters = ["Ln","W","acos","asin","atan",
                       "cos","sin","tan","acosh","asinh","atanh",
                       "cosh","sinh","tanh"]

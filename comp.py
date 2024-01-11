@@ -241,6 +241,10 @@ class NumericalComponent:
         self,other = convertToNumericalComponent(self),convertToNumericalComponent(other)
         return self-other*(c_floor(self/other))
 
+    def __round__(self,n:int):
+        num = complex(self)
+        return NumericalComponent(Fraction(str(round(num.real,n))),Fraction(str(round(num.imag,n))))
+
     #binary operator
 
     def __eq__(self,other):
@@ -312,6 +316,20 @@ class NumericalComponent:
 
     def isOnlyRationalReal(self):
         return self.imaginary == frac(0) and self.pi_multiple == frac(0) and len(self.sqrt_components) == frac(0)
+
+    def isLong(self):
+        if len(self.sqrt_components)>5: return True
+
+        if len(str(self.real.numerator))>8 or len(str(self.real.denominator))>8: return True
+        if len(str(self.imaginary.numerator))>8 or len(str(self.imaginary.denominator))>8: return True
+        if len(str(self.pi_multiple.numerator))>8 or len(str(self.pi_multiple.denominator))>8: return True
+        for r in self.sqrt_components:
+            for component in r:
+                if len(str(component.numerator))>8 or len(str(component.denominator))>8: return True
+
+        #else
+        return False
+
 
     #def __nonzero__(self):
     #    return not self.real == 0 and self.imaginary == 0 and self.pi_multiple == 0 and len(self.sqrt_components) == 0

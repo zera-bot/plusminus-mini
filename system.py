@@ -7,6 +7,30 @@ from comp import NumericalComponent
 from render import CombinedExpression,BaseExpression
 from copy import deepcopy
 
+menuScreenPoints = [(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 11), 
+                    (1, 12), (1, 13), (1, 14), (1, 15), (1, 16), (1, 17), (1, 18), (1, 19), (2, 1), (2, 9), 
+                    (2, 11), (2, 19), (3, 1), (3, 9), (3, 11), (3, 19), (4, 1), (4, 4), (4, 7), (4, 9), 
+                    (4, 11), (4, 13), (4, 16), (4, 17), (4, 19), (5, 1), (5, 3), (5, 4), (5, 5), (5, 6), 
+                    (5, 7), (5, 9), (5, 11), (5, 13), (5, 15), (5, 17), (5, 19), (6, 1), (6, 7), (6, 9), 
+                    (6, 11), (6, 14), (6, 17), (6, 19), (7, 1), (7, 9), (7, 11), (7, 19), (8, 1), (8, 9), 
+                    (8, 11), (8, 19), (9, 1), (9, 2), (9, 3), (9, 4), (9, 5), (9, 6), (9, 7), (9, 8), 
+                    (9, 9), (9, 11), (9, 12), (9, 13), (9, 14), (9, 15), (9, 16), (9, 17), (9, 18), 
+                    (9, 19), (11, 3), (11, 4), (11, 5), (11, 6), (11, 7), (11, 13), (11, 14), (11, 17), 
+                    (12, 2), (12, 8), (12, 12), (12, 15), (12, 18), (13, 2), (13, 8), (13, 12), (13, 15), 
+                    (13, 18), (14, 2), (14, 8), (14, 12), (14, 15), (14, 18), (15, 3), (15, 7), (15, 13), 
+                    (15, 16), (15, 17), (17, 3), (17, 4), (17, 5), (17, 6), (17, 7), (17, 13), (17, 14), 
+                    (17, 15), (17, 16), (17, 17), (18, 2), (18, 8), (18, 12), (18, 18), (19, 2), (19, 8), 
+                    (19, 12), (19, 18), (20, 2), (20, 8), (20, 12), (20, 18), (21, 3), (21, 4), (21, 5), 
+                    (21, 6), (21, 7), (21, 13), (21, 14), (21, 15), (21, 16), (21, 17), (23, 2), (23, 3), 
+                    (23, 4), (23, 5), (23, 6), (23, 7), (23, 8), (23, 12), (23, 13), (23, 14), (23, 15), 
+                    (23, 16), (23, 17), (23, 18), (24, 3), (24, 18), (25, 4), (25, 18), (26, 3), (26, 18), 
+                    (27, 2), (27, 3), (27, 4), (27, 5), (27, 6), (27, 7), (27, 8), (27, 18), (29, 2), 
+                    (29, 3), (29, 4), (29, 5), (29, 6), (29, 7), (29, 8), (29, 12), (29, 13), (29, 14), 
+                    (30, 2), (30, 5), (30, 15), (30, 16), (31, 2), (31, 5), (31, 17), (31, 18), (32, 2), 
+                    (32, 5), (32, 15), (32, 16), (33, 3), (33, 4), (33, 12), (33, 13), (33, 14), (35, 12), 
+                    (35, 13), (35, 14), (35, 15), (35, 16), (35, 17), (35, 18), (36, 12), (36, 15), 
+                    (36, 18), (37, 12), (37, 15), (37, 18), (38, 12), (38, 15), (38, 18)]
+
 def NCToExpression(nc:NumericalComponent):
     s = []
     if nc.real != 0: 
@@ -117,6 +141,9 @@ def renderUpdate(): #given the data state, renderUpdate() will update the screen
                 pointsTL = BaseExpression("-")
                 totalPoints+=pointsTL.points
             else:
+                for kind,k in enumerate(data["ans"]):
+                    if k.isLong(): data["ans"][kind]=round(k,6)
+
                 pointData = [NCToExpression(k) for k in data["ans"]]
                 voffset = 0
 
@@ -124,7 +151,7 @@ def renderUpdate(): #given the data state, renderUpdate() will update the screen
                     totalPoints+=render.offsetPointList(d.points,0,voffset)
                     voffset+=d.height+2 #padding
     elif currentMode == "MENU":
-        pass #do later lmao
+        totalPoints=menuScreenPoints.copy()
 
     currentScreen=totalPoints
     #perhaps convert to list of 0s and 1s but idk save it for whenever i get the lcd
@@ -217,7 +244,11 @@ def updateScreen(action):
             data["recievedAns"] = True
 
             try:
-                data["currentAns"] = NCToExpression(tokenizer.parse(tokenizer.tokenize(data["expr"])))
+                answer = tokenizer.parse(tokenizer.tokenize(data["expr"]))
+                if answer.isLong():
+                    answer = round(answer,8)
+
+                data["currentAns"] = NCToExpression(answer)
             except Exception as e:
                 data["currentAns"] = "-"
         elif currentMode == "SOLV":
@@ -276,16 +307,17 @@ def tortureTest():
         ["enter",[]],
         ["menu",[]],
         ["type",["2"]],
+        ["type",["1"]],
+        ["enter",[]],
+        ["type",["0"]],
+        ["enter",[]],
+        #["type",["-"]],
         ["type",["0"]],
         ["enter",[]],
         ["type",["0"]],
         ["enter",[]],
         ["type",["-"]],
-        ["type",["2"]],
-        ["enter",[]],
-        ["type",["0"]],
-        ["enter",[]],
-        ["type",["4"]],
+        ["type",["1"]],
         ["enter",[]],
         ["menu",[]],
         ["type",["1"]],
