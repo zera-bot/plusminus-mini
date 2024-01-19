@@ -235,6 +235,10 @@ class NumericalComponent:
     def __pow__(self,other):
         self,other = convertToNumericalComponent(self),convertToNumericalComponent(other)
         val = complex(self) ** complex(other)
+
+        if other == 2:
+            return NumericalComponent(self*self)
+
         return NumericalComponent(Fraction(val.real),Fraction(val.imag))
 
     def __mod__(self,other):

@@ -30,6 +30,42 @@ menuScreenPoints = [(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 
                     (32, 5), (32, 15), (32, 16), (33, 3), (33, 4), (33, 12), (33, 13), (33, 14), (35, 12), 
                     (35, 13), (35, 14), (35, 15), (35, 16), (35, 17), (35, 18), (36, 12), (36, 15), 
                     (36, 18), (37, 12), (37, 15), (37, 18), (38, 12), (38, 15), (38, 18)]
+closingScreenPoints = [(36, 22), (36, 23), (36, 24), (36, 25), (36, 26), (36, 27), (36, 28), (36, 29), 
+                       (37, 22), (37, 29), (38, 22), (38, 29), (39, 22), (39, 29), (40, 22), (40, 29), 
+                       (41, 22), (41, 29), (42, 22), (42, 29), (43, 22), (43, 29), (44, 22), (44, 29), 
+                       (45, 22), (45, 29), (46, 12), (46, 13), (46, 14), (46, 15), (46, 16), (46, 17), 
+                       (46, 18), (46, 19), (46, 20), (46, 21), (46, 22), (46, 29), (46, 30), (46, 31), 
+                       (46, 32), (46, 33), (46, 34), (46, 35), (46, 36), (46, 37), (46, 38), (46, 39), 
+                       (47, 12), (47, 39), (48, 12), (48, 39), (49, 12), (49, 39), (50, 12), (50, 39), 
+                       (50, 41), (50, 42), (50, 61), (51, 12), (51, 39), (51, 43), (51, 54), (51, 55), 
+                       (51, 56), (51, 57), (51, 58), (51, 59), (51, 60), (52, 12), (52, 39), (52, 44), 
+                       (52, 48), (52, 49), (52, 50), (52, 51), (52, 52), (52, 53), (52, 59), (53, 12), 
+                       (53, 13), (53, 14), (53, 15), (53, 16), (53, 17), (53, 18), (53, 19), (53, 20), 
+                       (53, 21), (53, 22), (53, 29), (53, 30), (53, 31), (53, 32), (53, 33), (53, 34), 
+                       (53, 35), (53, 36), (53, 37), (53, 38), (53, 39), (53, 45), (53, 46), (53, 47), 
+                       (53, 58), (54, 22), (54, 29), (54, 57), (55, 19), (55, 22), (55, 29), (55, 56), 
+                       (56, 18), (56, 22), (56, 29), (56, 55), (57, 18), (57, 22), (57, 29), (57, 54), 
+                       (58, 17), (58, 22), (58, 29), (58, 53), (59, 17), (59, 22), (59, 29), (59, 52), 
+                       (60, 17), (60, 22), (60, 29), (60, 51), (61, 16), (61, 22), (61, 29), (61, 50), 
+                       (62, 16), (62, 22), (62, 29), (62, 49), (63, 16), (63, 22), (63, 23), (63, 24), 
+                       (63, 25), (63, 26), (63, 27), (63, 28), (63, 29), (63, 49), (64, 16), (64, 49), 
+                       (65, 16), (65, 38), (65, 39), (65, 40), (65, 41), (65, 42), (65, 43), (65, 44), 
+                       (65, 45), (65, 49), (66, 16), (66, 38), (66, 45), (66, 49), (67, 15), (67, 38), 
+                       (67, 45), (67, 49), (68, 14), (68, 38), (68, 45), (68, 48), (69, 13), (69, 38), 
+                       (69, 45), (69, 48), (70, 12), (70, 38), (70, 45), (70, 48), (71, 11), (71, 38), 
+                       (71, 45), (71, 47), (72, 10), (72, 38), (72, 45), (72, 47), (73, 9), (73, 38), 
+                       (73, 45), (74, 7), (74, 8), (74, 38), (74, 45), (75, 6), (75, 17), (75, 18), 
+                       (75, 19), (75, 20), (75, 21), (75, 38), (75, 45), (76, 5), (76, 12), (76, 13), 
+                       (76, 14), (76, 15), (76, 16), (76, 22), (76, 38), (76, 45), (77, 4), (77, 5), 
+                       (77, 6), (77, 7), (77, 8), (77, 9), (77, 10), (77, 11), (77, 23), (77, 38), 
+                       (77, 45), (78, 3), (78, 24), (78, 25), (78, 26), (78, 38), (78, 45), (79, 27), 
+                       (79, 28), (79, 38), (79, 45), (80, 29), (80, 30), (80, 31), (80, 32), (80, 33), 
+                       (80, 34), (80, 35), (80, 36), (80, 38), (80, 45), (81, 38), (81, 45), (82, 38), 
+                       (82, 45), (83, 38), (83, 45), (84, 38), (84, 45), (85, 38), (85, 45), (86, 38), 
+                       (86, 45), (87, 38), (87, 45), (88, 38), (88, 45), (89, 38), (89, 45), (90, 38), 
+                       (90, 45), (91, 38), (91, 39), (91, 40), (91, 41), (91, 42), (91, 43), (91, 44), 
+                       (91, 45)]
+
 
 def NCToExpression(nc:NumericalComponent):
     s = []
@@ -83,7 +119,8 @@ data = {
     "expr":"",
     "cursor":0,
     "currentAns":"",
-    "recievedAns":False}
+    "recievedAns":False,
+    "scroll":0}
 
 """data = {
     "currentPower":4,
@@ -103,7 +140,8 @@ defaultDatas = {
     "expr":"",
     "cursor":0,
     "currentAns":"",
-    "recievedAns":False},
+    "recievedAns":False,
+    "scroll":0},
 
     "SOLV":{
     "currentPower":4,
@@ -111,8 +149,18 @@ defaultDatas = {
     "cursor":0,
     "hasAns":False,
     "inputs":[],
-    "ans":[]}
+    "ans":[],
+    "scroll":0}
 }
+
+def getMaxScreenHeight(expression):
+    h = render.generate(expression).height
+
+    if h < y-5: return 0
+    else: return h-y+5
+
+
+
 
 def renderUpdate(): #given the data state, renderUpdate() will update the screen
     global data,currentMode,currentScreen
@@ -126,7 +174,7 @@ def renderUpdate(): #given the data state, renderUpdate() will update the screen
         pointsBR = data["currentAns"] if data["currentAns"] != "-" else BaseExpression("-")
         pointsBRList = render.offsetPointList(pointsBR.points,x-pointsBR.width,y-pointsBR.height) if pointsBR else []
 
-        totalPoints+=pointsTL.points
+        totalPoints+=render.offsetPointList(pointsTL.points,0,-data["scroll"])
         totalPoints+=pointsBRList
     elif currentMode == "SOLV":
         if data["currentPower"]>=0:
@@ -134,7 +182,7 @@ def renderUpdate(): #given the data state, renderUpdate() will update the screen
             pointsBR = render.generate(f"[Power]<-,{str(data['currentPower'])}>")
             pointsBRList = render.offsetPointList(pointsBR.points,x-pointsBR.width,y-pointsBR.height)
 
-            totalPoints+=pointsTL.points
+            totalPoints+=render.offsetPointList(pointsTL.points,0,-data["scroll"])
             totalPoints+=pointsBRList
         else:
             if data["ans"]=="-":
@@ -175,12 +223,27 @@ def updateScreen(action):
                     data["expr"],data["cursor"] = mathcode.incrementCursorLeft(data["expr"],data["cursor"])
                 elif parameters[0] == "right":
                     data["expr"],data["cursor"] = mathcode.incrementCursorRight(data["expr"],data["cursor"])
+
+                if not data["recievedAns"]:
+                    if parameters[0] == "up":
+                        data["scroll"]-=5
+                        if data["scroll"]<0: data["scroll"]=0
+                    elif parameters[0] == "down":
+                        data["scroll"]+=5
+                        if data["scroll"]>getMaxScreenHeight(data["expr"]): data["scroll"]=getMaxScreenHeight(data["expr"])
         elif currentMode == "SOLV":
             if not data["hasAns"]:
                 if parameters[0] == "left":
                     data["expr"],data["cursor"] = mathcode.incrementCursorLeft(data["expr"],data["cursor"])
                 elif parameters[0] == "right":
-                    data["expr"],data["cursor"] = mathcode.incrementCursorRight(data["expr"],data["cursor"])                
+                    data["expr"],data["cursor"] = mathcode.incrementCursorRight(data["expr"],data["cursor"])          
+                elif parameters[0] == "up":
+                    data["scroll"]-=5
+                    if data["scroll"]<0: data["scroll"]=0
+                elif parameters[0] == "down":
+                    data["scroll"]+=5
+                    if data["scroll"]>getMaxScreenHeight(data["expr"]): data["scroll"]=getMaxScreenHeight(data["expr"])
+
     elif action[0] == "type": #we are typing something
         if currentMode == "CALC":
             if data["recievedAns"] == True:
@@ -345,6 +408,8 @@ def tortureTest():
 equalsKey = "="
 rightKey = "right"
 leftKey = "left"
+upKey = "up"
+downKey = "down"
 menuKey = "menu"
 backspaceKey = "backspace"
 clearKey = "clear"
@@ -397,6 +462,10 @@ def parseInput(inp):
         updateScreen(["cursor",["left"]])
     elif inp == rightKey:
         updateScreen(["cursor",["right"]])
+    elif inp == upKey:
+        updateScreen(["cursor",["up"]])
+    elif inp == downKey:
+        updateScreen(["cursor",["down"]])
     elif inp == clearKey:
         updateScreen(["clear",[]])
 
