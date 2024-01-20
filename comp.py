@@ -237,7 +237,7 @@ class NumericalComponent:
         val = complex(self) ** complex(other)
 
         if other == 2:
-            return NumericalComponent(self*self)
+            return self*self
 
         return NumericalComponent(Fraction(val.real),Fraction(val.imag))
 

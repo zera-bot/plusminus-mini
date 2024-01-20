@@ -106,6 +106,7 @@ def NCToExpression(nc:NumericalComponent):
         r+=i[1]
 
     r = r.replace("+-","-")
+    r = r.replace("--","-")
     if r == "": r = "0"
     if r[0]=="+": r = r[1:]
 
