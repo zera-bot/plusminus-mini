@@ -160,9 +160,6 @@ def getMaxScreenHeight(expression):
     if h < y-5: return 0
     else: return h-y+5
 
-
-
-
 def renderUpdate(): #given the data state, renderUpdate() will update the screen
     global data,currentMode,currentScreen
     currentScreen = render.generateArray(x,y)
@@ -180,7 +177,7 @@ def renderUpdate(): #given the data state, renderUpdate() will update the screen
     elif currentMode == "SOLV":
         if data["currentPower"]>=0:
             pointsTL = render.generate(mathcode.render(data["expr"],data["cursor"]))
-            pointsBR = render.generate(f"[Power]<-,{str(data['currentPower'])}>")
+            pointsBR = render.generate(f"[Power]<x,{str(data['currentPower'])}>")
             pointsBRList = render.offsetPointList(pointsBR.points,x-pointsBR.width,y-pointsBR.height)
 
             totalPoints+=render.offsetPointList(pointsTL.points,0,-data["scroll"])

@@ -1,4 +1,5 @@
 from comp import *
+from methods import erf
 
 lambdas = {
     "Frac": lambda p,q: p / q,
@@ -12,6 +13,7 @@ lambdas = {
     "Abs": lambda x: abs(x),
     "Choose": lambda n,k: c_choose(n,k),
     "W": lambda x: c_W(x),
+    "Erf": lambda x: erf(x),
     "Floor": lambda x: c_floor(x),
     "Ceil": lambda x: c_ceil(x),
     "Paren":lambda x: x, #parentheses
@@ -47,6 +49,7 @@ numbersOfParameters = {
     "Abs": 1,
     "Choose": 2,
     "W": 1,
+    "Erf": 1,
     "Floor": 1,
     "Ceil": 1,
     "Paren": 1,
@@ -72,4 +75,4 @@ numbersOfParameters = {
 
 functionDelimiters = ["Ln","W","acos","asin","atan",
                       "cos","sin","tan","acosh","asinh","atanh",
-                      "cosh","sinh","tanh"]
+                      "cosh","sinh","tanh","Erf"]

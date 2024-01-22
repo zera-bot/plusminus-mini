@@ -1,6 +1,7 @@
 from comp import c_sqrt as sqrt
 from comp import NumericalComponent,frac
 from fractions import Fraction
+from math import factorial
 
 import xmath
 
@@ -179,3 +180,31 @@ def evaluateDefiniteIntegral(f,a,b):
         sumLeft += f(a + i*dx)*dx
 
     return (sumLeft+sumRight)/2
+
+def summation(f,a,b): #capital sigma
+    _sum = NumericalComponent()
+    for k in range(b-a+1):
+        n = k+a
+        _sum+=f(n)
+    return _sum
+
+def product(f,a,b): #capital sigma
+    _prod = NumericalComponent()
+    for k in range(b-a+1):
+        n = k+a
+        _prod*=f(n)
+    return _prod
+
+# misc
+
+def erf(z):
+    const = 2/sqrt(NumericalComponent(pi_multiple=1))
+    f = lambda x: ((-1)**x) * (z**(2*x+1))/(factorial(x)*(2*x+1))
+    _sum = summation(f,0,1000)
+    return const*_sum
+
+def lambertW(x):
+    f = lambda n: (x**n) * ((-n)**(n-NumericalComponent(1)))/(factorial(n))
+    return summation(f,1,100)
+
+print(lambertW(1))

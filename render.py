@@ -36,7 +36,7 @@ def isExpressionType(obj):
 
 class BaseExpression: #only store data for expressions
     def __init__(self,value,isSmall=False):
-        if value == "": value = "q"
+        if value == "": value = "_"
         self.value = value
         self.isSmall = isSmall
 
@@ -62,7 +62,7 @@ class DelimiterExpression:
     def __init__(self,delim,inputs):
         expectedAmount = numbersOfParameters[delim]
         for i in range(expectedAmount-len(inputs)):
-            inputs.append(BaseExpression("q"))
+            inputs.append(BaseExpression("_"))
 
         self.delim = delim
         #below should be either of type DelimiterExpression or BaseExpression
@@ -358,9 +358,9 @@ to represent the width and height of stuff I'll create a
 class designed to calculate and store the components and width/height data
 """
 def replacePrincipalVariables(s):
-    s = s.replace("[Pi]","p")
+    s = s.replace("[Pi]","P")
     s = s.replace("[i]","i")
-    s = s.replace("[E]","e")
+    s = s.replace("[E]","E")
     return s
 
 def replacePrincipalVariablesInList(l):

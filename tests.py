@@ -90,13 +90,14 @@ def renderTest():
          "[Sqrt]<[Power]<i+1,i>-1>",
          "[Paren]<[Frac]<[Frac]<2,3>,4>+[Frac]<5,2>>",
          "[NthRoot]<2,2i>",
-         "[NthRoot]<[Frac]<3,4>+e,[Frac]<2i,3>>",
-         "[LogBase]<e,17>",
+         "[NthRoot]<[Frac]<3,4>+[E],[Frac]<2i,3>>",
+         "[LogBase]<[E],17>",
          "[Frac]<[LogBase]<[Frac]<[Frac]<2+[Frac]<3,2>,2+[Frac]<3,2*2+[cos]<4>+3>>,3>,[Frac]<3,[Frac]<1,1+[acos]<1>>>>,17>",
          "[Frac]<[LogBase]<[Frac]<[Frac]<2+[Frac]<3,2>,5>,3>,[Frac]<3,[Frac]<1,2>>>,17>",
          "[Factorial]<[Frac]<2,[Frac]<3,[sin]<5>>>>",
          "[Ln]<[Frac]<2,[Frac]<3,[sin]<5>+3>>-[sin]<3>>",
-         "[Sqrt]<[Frac]<3,4>-1>"
+         "[Sqrt]<[Frac]<3,4>-1>",
+         "[Erf]<3x+1>"
          ]
     
     for ind,m in enumerate(l):
