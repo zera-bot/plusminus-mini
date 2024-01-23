@@ -35,4 +35,4 @@ A "demo" can be seen in [the system torture test folder.](/systemTortureTest)
 - Want the whole system? Sure, go for it!
 - You just need the main computational stuff? Try taking `comp.py`, `xmath.py`, and (optional) `methods.py`.
 - Want to be able to write and parse expressions in the math string format? Also take `mathcode.py`, `tokenizer.py`, and `delimiters.py`.
-- To start rendering, you'll need the computational stuff and `render.py`, `renderformats.py`, `tokenizer.py`, and `delimiters.py`.
+- To start rendering, you'll need `render.py`, `renderformats.py`, `tokenizer.py`, and `delimiters.py`.
