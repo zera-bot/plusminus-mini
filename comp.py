@@ -34,6 +34,12 @@ def convertToNumericalComponent(number):
         
 
 class Variable:
+    """
+    Class for representing variables.
+
+    symbol = the used symbol for the variable
+    """
+
     def __init__(self,symbol:str):
         self.symbol = symbol
 
@@ -44,6 +50,19 @@ class Variable:
         return str(self)
 
 class NumericalComponent:
+    """
+    Main class for representing numbers using the `fractions` library.
+    Parameters listed below.
+    
+    real = the rational real value
+
+    imaginary = the rational imaginary value
+
+    pi_multiple = fractional multiple of pi
+
+    sqrt_components = a list of lists in form [coeff,root] representing coeff*sqrt(root)
+    """
+
     def __init__(self, real=frac(0), imaginary=frac(0), pi_multiple=frac(0), sqrt_components=[]):
         if not isinstance(real,Fraction):
             real = Fraction(real)
@@ -209,6 +228,9 @@ class NumericalComponent:
 
                     mainSum+=NumericalComponent(self.real/divisionValue, self.imaginary/divisionValue,
                     self.pi_multiple/divisionValue, [[k[0]/divisionValue,k[1]] for k in self.sqrt_components])
+            else: #dividing by 1 sqrt component
+                r = other.sqrt_components[0]
+                mainSum+=(self/r[0]) * (NumericalComponent(sqrt_components=[[1,r[1]]])/(r[1]))
         else: #just approximate at this point
             selfRealComponent = self.real
             otherRealComponent = other.real
@@ -337,6 +359,99 @@ class NumericalComponent:
 
     #def __nonzero__(self):
     #    return not self.real == 0 and self.imaginary == 0 and self.pi_multiple == 0 and len(self.sqrt_components) == 0
+
+class DecimalRepresentation:
+    """
+    Stores a decimal Representation of a NumericalComponent or complex object.
+    Use only for final representations of numbers (this method does not
+    contain any methods for operations).
+    """
+    def __init__(self,num,precision):
+        if isinstance(num,NumericalComponent):
+            num = complex(num)
+
+        #stored as floating point numbers
+        self.real = num.real
+        self.imag = num.imag
+        self.precision = precision
+
+    def __str__(self):
+        s = []
+        if self.real != 0:
+            if self.real%1==0: s.append(str(int(self.real)))
+            else: s.append(str(round(self.real,self.precision)))
+        if self.imag != 0:
+            if self.imag%1==0: s.append(str(int(self.imag))+"i")
+            else: s.append(str(round(self.imag,self.precision))+"i")
+
+        # this method works if we have something like 0.003
+        # with precision 1 because it will return 0.0
+        # to show that it wasn't exactly 0 but around 0
+
+        string = "+".join(s)
+        string = string.replace("+-","-")
+        if string == "": string = "0"
+        return string
+
+    def __repr__(self):
+        return str(self)
+
+class ScientificNotationRepresentation:
+    """
+    Stores a scientific notation representation of a NumericalComponent object.
+    Use only for final representations of numbers (this method does not
+    contain any methods for operations).
+    """  
+    def __init__(self,num,precision):
+        if isinstance(num,NumericalComponent):
+            num = complex(num)
+
+        # coefficient * 10 ^ power
+        # for both real and imaginary
+        self.precision = precision
+        self.realValue = num.real
+        self.imagValue = num.imag
+
+        realLessReference = self.realValue<1 and self.realValue>-1
+        imagLessReference = self.imagValue<1 and self.imagValue>-1
+        print(realLessReference,imagLessReference)
+        realLessThanOne = -1 if realLessReference else 1
+        imagLessThanOne = -1 if imagLessReference else 1
+        realString = str(num.real).split(".")[0 if not realLessThanOne else 1].replace("-","")
+        imagString = str(num.imag).split(".")[0 if not imagLessThanOne else 1].replace("-","")
+        
+        rc = 1
+        ic = 1
+        for char in [*realString]:
+            if char != "0": break
+            else: rc+=1
+        for char in [*imagString]:
+            if char != "0": break
+            else: ic+=1
+
+        self.realPower=-rc
+        self.imagPower=-ic
+        if not realLessThanOne: self.realPower = len(realString)-1
+        if not imagLessThanOne: self.imagPower = len(imagString)-1
+
+        self.realCoefficient = self.realValue/10**self.realPower
+        self.imagCoefficient = self.imagValue/10**self.imagPower
+
+    def __str__(self):
+        s = []
+
+        if self.realValue != 0:
+            s.append(str(round(self.realValue,self.precision))+"*10^"+str(self.realPower))
+        if self.imagValue != 0:
+            s.append(str(round(self.imagValue,self.precision))+"*10^"+str(self.imagPower))
+
+        string = " + ".join(s)
+        string = string.replace("+ -","- ")
+        if string == "": string = "0"
+        return string
+    
+    def __repr__(self):
+        return str(self)
 
 # library
 

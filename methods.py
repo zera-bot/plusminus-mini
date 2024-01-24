@@ -203,8 +203,6 @@ def erf(z):
     _sum = summation(f,0,1000)
     return const*_sum
 
-def lambertW(x):
+def lambertW(x): #work in progress
     f = lambda n: (x**n) * ((-n)**(n-NumericalComponent(1)))/(factorial(n))
     return summation(f,1,100)
-
-print(lambertW(1))

@@ -3,7 +3,7 @@ import render
 import delimiters
 import tokenizer
 import methods
-from comp import NumericalComponent
+from comp import NumericalComponent, DecimalRepresentation
 from render import CombinedExpression,BaseExpression
 from copy import deepcopy
 
@@ -67,7 +67,10 @@ closingScreenPoints = [(36, 22), (36, 23), (36, 24), (36, 25), (36, 26), (36, 27
                        (91, 45)]
 
 
-def NCToExpression(nc:NumericalComponent):
+def NCToExpression(nc):
+    if isinstance(nc,DecimalRepresentation):
+        return render.generate(str(nc))
+
     s = []
     if nc.real != 0: 
         sreal = str(nc.real)
@@ -188,7 +191,7 @@ def renderUpdate(): #given the data state, renderUpdate() will update the screen
                 totalPoints+=pointsTL.points
             else:
                 for kind,k in enumerate(data["ans"]):
-                    if k.isLong(): data["ans"][kind]=round(k,6)
+                    if k.isLong(): data["ans"][kind]=DecimalRepresentation(k,6)
 
                 pointData = [NCToExpression(k) for k in data["ans"]]
                 voffset = 0
@@ -307,7 +310,7 @@ def updateScreen(action):
             try:
                 answer = tokenizer.parse(tokenizer.tokenize(data["expr"]))
                 if answer.isLong():
-                    answer = round(answer,8)
+                    answer = DecimalRepresentation(answer,8)
 
                 data["currentAns"] = NCToExpression(answer)
             except Exception as e:
@@ -372,8 +375,8 @@ def tortureTest():
         ["enter",[]],
         ["type",["0"]],
         ["enter",[]],
-        #["type",["-"]],
-        ["type",["0"]],
+        ["type",["-"]],
+        ["type",["4"]],
         ["enter",[]],
         ["type",["0"]],
         ["enter",[]],
