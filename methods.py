@@ -183,15 +183,13 @@ def evaluateDefiniteIntegral(f,a,b):
 
 def summation(f,a,b): #capital sigma
     _sum = NumericalComponent()
-    for k in range(b-a+1):
-        n = k+a
+    for n in range(a,b+1):
         _sum+=f(n)
     return _sum
 
 def product(f,a,b): #capital sigma
     _prod = NumericalComponent()
-    for k in range(b-a+1):
-        n = k+a
+    for n in range(a,b+1):
         _prod*=f(n)
     return _prod
 
@@ -203,6 +201,6 @@ def erf(z):
     _sum = summation(f,0,1000)
     return const*_sum
 
-def lambertW(x): #work in progress
+def lambertW(x):# works for pretty small values of x :sob:
     f = lambda n: (x**n) * ((-n)**(n-NumericalComponent(1)))/(factorial(n))
     return summation(f,1,100)

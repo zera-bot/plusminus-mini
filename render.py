@@ -143,7 +143,7 @@ class DelimiterExpression:
             points+=offsetPointList(self.inputs[0].points,6,3)
 
             width = w+7
-            height = h+2
+            height = h+3
         elif delim == "Paren":
             w = self.inputs[0].width
             h = self.inputs[0].height

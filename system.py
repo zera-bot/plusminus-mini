@@ -87,13 +87,13 @@ def NCToExpression(nc):
                 
     if nc.pi_multiple != 0:
         spim = str(nc.pi_multiple)
-        if "/" in spim: s.append([nc.pi_multiple,f"[Frac]<{abs(nc.pi_multiple.numerator)},{nc.pi_multiple.denominator}>p"])
+        if "/" in spim: s.append([nc.pi_multiple,f"[Frac]<{abs(nc.pi_multiple.numerator)},{nc.pi_multiple.denominator}>P"])
         else: 
             #s.append([nc.pi_multiple,spim+"p"])
             if abs(nc.pi_multiple)==1: 
-                s.append([nc.pi_multiple,"i"])
+                s.append([nc.pi_multiple,"P"])
             else:
-                s.append([nc.pi_multiple,str(abs(nc.pi_multiple))+"i"])
+                s.append([nc.pi_multiple,str(abs(nc.pi_multiple))+"P"])
     for r in nc.sqrt_components:
         ssq = str(r[0])
         if "/" in ssq: s.append([r[0],f"[Frac]<{abs(r[0].numerator)},{r[0].denominator}>[Sqrt]<{r[1]}>"])
@@ -396,7 +396,7 @@ def tortureTest():
         ["cursor",["right"]],
         ["type",["-"]],
         ["type",["2"]],
-        ["type",["i"]],
+        ["type",["P"]],
         ["enter",[]]
     ]
 
@@ -448,7 +448,7 @@ delimInputs = {
 typeInputs = [
     "0","1","2","3","4","5","6","7","8","9",
     "+","-","*","/","."
-    "e","p","i"
+    "E","P","i"
 ]#single chars
 def parseInput(inp):
     if inp in typeInputs:

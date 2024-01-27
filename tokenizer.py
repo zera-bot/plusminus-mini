@@ -164,8 +164,8 @@ def tokenize(s):
     s = s.replace("][","]*[")
     
     s = s.replace(" ", "")
-    s = s.replace("[Pi]", "p")
-    s = s.replace("[E]", "e")
+    s = s.replace("[Pi]", "P")
+    s = s.replace("[E]", "E")
     s = s.replace("[i]", "i")
 
     s = s.replace("[X]", "[X]< >")
@@ -224,13 +224,13 @@ def parseSmallStatements(s: str):
         if i == "i": n = "1"
         if "i" in i:  #imaginary number
             evalString += "NumericalComponent(imaginary=Fraction(" + n + "))"
-        elif "p" in i:  #pi multiple
-            n = i.replace("p", "")
-            if i == "p": n = "1"
+        elif "P" in i:  #pi multiple
+            n = i.replace("P", "")
+            if i == "P": n = "1"
             evalString += "NumericalComponent(pi_multiple=Fraction(" + n + "))"
-        elif "e" in i:
-            n = i.replace("e", "")
-            if i == "e": n = "1"
+        elif "E" in i:
+            n = i.replace("E", "")
+            if i == "E": n = "1"
             evalString += "NumericalComponent(Fraction(" +n+ ")*xmath.e)"
         else:
             evalString += "NumericalComponent(Fraction(" + i + "))"
