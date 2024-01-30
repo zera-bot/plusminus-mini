@@ -3,6 +3,7 @@ import render
 import delimiters
 import tokenizer
 import methods
+import renderformats
 from comp import NumericalComponent, DecimalRepresentation
 from render import CombinedExpression,BaseExpression
 from copy import deepcopy
@@ -163,6 +164,21 @@ def getMaxScreenHeight(expression):
     if h < y-5: return 0
     else: return h-y+5
 
+def getHorizontalScroll(expression):
+    if expression.width <= x: return 0
+    cursorPoint = 0
+
+    #find cursor
+    for point in expression.points:
+        l = [(x_+point[0],y_+point[1])for x_,y_ in renderformats.smallNumbers["|"]["points"]]
+        for i in l:
+            if i not in expression.points: break
+        else: #it is there
+            cursorPoint = point[0]
+
+    if cursorPoint <= x: return 0
+    else: return x-cursorPoint-4
+
 def renderUpdate(): #given the data state, renderUpdate() will update the screen
     global data,currentMode,currentScreen
     currentScreen = render.generateArray(x,y)
@@ -175,7 +191,7 @@ def renderUpdate(): #given the data state, renderUpdate() will update the screen
         pointsBR = data["currentAns"] if data["currentAns"] != "-" else BaseExpression("-")
         pointsBRList = render.offsetPointList(pointsBR.points,x-pointsBR.width,y-pointsBR.height) if pointsBR else []
 
-        totalPoints+=render.offsetPointList(pointsTL.points,0,-data["scroll"])
+        totalPoints+=render.offsetPointList(pointsTL.points,getHorizontalScroll(pointsTL),-data["scroll"])
         totalPoints+=pointsBRList
     elif currentMode == "SOLV":
         if data["currentPower"]>=0:
@@ -183,7 +199,7 @@ def renderUpdate(): #given the data state, renderUpdate() will update the screen
             pointsBR = render.generate(f"[Power]<x,{str(data['currentPower'])}>")
             pointsBRList = render.offsetPointList(pointsBR.points,x-pointsBR.width,y-pointsBR.height)
 
-            totalPoints+=render.offsetPointList(pointsTL.points,0,-data["scroll"])
+            totalPoints+=render.offsetPointList(pointsTL.points,getHorizontalScroll(pointsTL),-data["scroll"])
             totalPoints+=pointsBRList
         else:
             if data["ans"]=="-":

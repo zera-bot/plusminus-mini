@@ -184,7 +184,7 @@ def systemTest():
         ["type",["-"]],
         ["type",["2"]],
         ["type",["P"]],
-        ["enter",[]]
+        ["enter",[]],
     ]
 
     for ind,i in enumerate(tests):
@@ -194,3 +194,4 @@ def systemTest():
 compTest()
 renderTest()
 parserTest()
+systemTest()

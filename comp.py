@@ -494,11 +494,19 @@ def c_choose(n:NumericalComponent,k:NumericalComponent):
     except TypeError:
         return NumericalComponent()
 
-def c_W(n:NumericalComponent):
-    c = ( n / ( NumericalComponent(frac(1)) + n) )
-    ans = c * ( ( NumericalComponent(frac(1)) + NumericalComponent(frac(2))*n ) / ( n + NumericalComponent(xmath.e)**(c) ) )
-    approxAns = complex(ans)
-    return NumericalComponent(Fraction(approxAns.real),Fraction(approxAns.imag))
+def c_W(z):
+    # uses Halley-type iteration to arrive at an approximation
+    z = complex(z)
+    l = [cmath.log(z)]
+    for i in range(10000):
+        try:
+            smallFrac = ( (2+l[-1])*(l[-1]*cmath.exp(l[-1]) -z))/( 2*(l[-1]+1) )
+            largeFrac = ( l[-1]*cmath.exp(l[-1]) -z )/( cmath.exp(l[-1]) * (l[-1]+1) - smallFrac) 
+            l.append(l[-1]-largeFrac)
+        except Exception: break
+
+    # l[-1] is answer so format it now 
+    return NumericalComponent(l[-1].real,l[-1].imag)
 
 # trig functions
 

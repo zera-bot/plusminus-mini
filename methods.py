@@ -200,7 +200,3 @@ def erf(z):
     f = lambda x: ((-1)**x) * (z**(2*x+1))/(factorial(x)*(2*x+1))
     _sum = summation(f,0,1000)
     return const*_sum
-
-def lambertW(x):# works for pretty small values of x :sob:
-    f = lambda n: (x**n) * ((-n)**(n-NumericalComponent(1)))/(factorial(n))
-    return summation(f,1,100)
