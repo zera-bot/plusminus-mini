@@ -1,6 +1,7 @@
 from comp import *
 from tokenizer import *
 from render import *
+from system import *
 from PIL import Image,ImageDraw
 
 # draw functions
@@ -11,6 +12,16 @@ def drawExpression(expression,size,path="image.png"):
     draw = ImageDraw.Draw(img)
 
     for point in expression.points:
+        draw.point(point,(0,0,0,255))
+
+    img.save(path)
+
+def renderCurrentScreen(path="image.png"):
+    currentScreen = getScreen()
+    img = Image.new("RGB",(x,y),(255,255,255,255))
+    draw = ImageDraw.Draw(img)
+
+    for point in currentScreen:
         draw.point(point,(0,0,0,255))
 
     img.save(path)
@@ -137,6 +148,48 @@ def parserTest():
 
     for i in l:
         print(str(parse(tokenize(i))))
+
+def systemTest():
+    tests = [
+        ["type",["3"]],
+        ["type",["+"]],
+        ["type",["4"]],
+        ["type",["i"]],
+        ["enter",[]],
+        ["menu",[]],
+        ["type",["2"]],
+        ["type",["1"]],
+        ["enter",[]],
+        ["type",["0"]],
+        ["enter",[]],
+        ["type",["-"]],
+        ["type",["4"]],
+        ["enter",[]],
+        ["type",["0"]],
+        ["enter",[]],
+        ["type",["-"]],
+        ["type",["1"]],
+        ["enter",[]],
+        ["menu",[]],
+        ["type",["1"]],
+        ["delim",["Frac"]],
+        ["delim",["Power"]],
+        ["type",["4"]],
+        ["cursor",["right"]],
+        ["type",["5"]],
+        ["cursor",["right"]],
+        ["cursor",["right"]],
+        ["type",["6"]],
+        ["cursor",["right"]],
+        ["type",["-"]],
+        ["type",["2"]],
+        ["type",["P"]],
+        ["enter",[]]
+    ]
+
+    for ind,i in enumerate(tests):
+        updateScreen(i)
+        renderCurrentScreen(f"systemTortureTest/{str(ind+1)}.png")
 
 compTest()
 renderTest()

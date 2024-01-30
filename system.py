@@ -340,16 +340,9 @@ def updateScreen(action):
     
     renderUpdate()
     
-from PIL import Image,ImageDraw
-def renderCurrentScreen(path="image.png"):
+def getScreen():
     global currentScreen
-    img = Image.new("RGB",(x,y),(255,255,255,255))
-    draw = ImageDraw.Draw(img)
-
-    for point in currentScreen:
-        draw.point(point,(0,0,0,255))
-
-    img.save(path)
+    return currentScreen
 
 #input types:
 """
@@ -361,48 +354,6 @@ backspace
 left,right arrow
 enter/equals button
 """
-
-def tortureTest():
-    tests = [
-        ["type",["3"]],
-        ["type",["+"]],
-        ["type",["4"]],
-        ["type",["i"]],
-        ["enter",[]],
-        ["menu",[]],
-        ["type",["2"]],
-        ["type",["1"]],
-        ["enter",[]],
-        ["type",["0"]],
-        ["enter",[]],
-        ["type",["-"]],
-        ["type",["4"]],
-        ["enter",[]],
-        ["type",["0"]],
-        ["enter",[]],
-        ["type",["-"]],
-        ["type",["1"]],
-        ["enter",[]],
-        ["menu",[]],
-        ["type",["1"]],
-        ["delim",["Frac"]],
-        ["delim",["Power"]],
-        ["type",["4"]],
-        ["cursor",["right"]],
-        ["type",["5"]],
-        ["cursor",["right"]],
-        ["cursor",["right"]],
-        ["type",["6"]],
-        ["cursor",["right"]],
-        ["type",["-"]],
-        ["type",["2"]],
-        ["type",["P"]],
-        ["enter",[]]
-    ]
-
-    for ind,i in enumerate(tests):
-        updateScreen(i)
-        renderCurrentScreen(f"systemTortureTest/{str(ind+1)}.png")
 
 
 #replace these values with the real key inputs later
@@ -473,6 +424,3 @@ def parseInput(inp):
     for key,v in delimInputs.items():
         if inp == key:
             updateScreen(["delim",[v]])
-    
-
-tortureTest()
