@@ -373,52 +373,86 @@ enter/equals button
 
 
 #replace these values with the real key inputs later
-equalsKey = "="
-rightKey = "right"
-leftKey = "left"
-upKey = "up"
-downKey = "down"
-menuKey = "menu"
-backspaceKey = "backspace"
-clearKey = "clear"
+equalsKey = 3
+rightKey = 34
+leftKey = 33
+upKey = 32
+downKey = 31
+menuKey = 29
+backspaceKey = 17
+clearKey = 18
+
+shiftKey = 35
+cmdKey = 36
 
 delimInputs = {
-    "Frac": "Frac",
-    "Power": "Power",
-    "Mod": "Mod",
-    "Sqrt": "Sqrt",
-    "NthRoot": "NthRoot",
-    "LogBase": "LogBase",
-    "Ln": "Ln",
-    "Factorial": "Factorial",
-    "Abs": "Abs",
-    "Choose": "Choose",
-    "W": "W",
-    "Floor": "Floor",
-    "Ceil": "Ceil",
-    "Paren": "Paren",
+    25: "Frac",
+    23: "Power",
+    2: "Mod",
+    26: "Sqrt",
+    27: "NthRoot",
+    20: "LogBase",
+    21: "Ln",
+    69: "Factorial",
+    22: "Abs",
+    70: "Choose",
+    73: "W",
+    71: "Floor",
+    72: "Ceil",
+    24: "Paren",
 
-    "acos": "acos",
-    "asin": "asin",
-    "atan": "atan",
-    "cos": "cos",
-    "sin": "sin",
-    "tan": "tan",
+    126: "acos",
+    125: "asin",
+    127: "atan",
+    120: "cos",
+    119: "sin",
+    121: "tan",
 
-    "acosh": "acosh",
-    "asinh": "asinh",
-    "atanh": "atanh",
-    "cosh": "cosh",
-    "sinh": "sinh",
-    "tanh": "tanh",
+    110: "acosh",
+    109: "asinh",
+    111: "atanh",
+    115: "cosh",
+    114: "sinh",
+    116: "tanh",
 } # delimiters -- key is 
-typeInputs = [
-    "0","1","2","3","4","5","6","7","8","9",
-    "+","-","*","/","."
-    "E","P","i"
-]#single chars
+#typeInputs = [
+#    "0","1","2","3","4","5","6","7","8","9",
+#    "+","-","*","/","."
+#    "E","P","i"
+#] #single chars
+
+typeInputs = {
+    0:"0",
+    4:"1",
+    5:"2",
+    6:"3",
+    9:"4",
+    10:"5",
+    11:"6",
+    14:"7",
+    15:"8",
+    16:"9",
+
+    7:"+",
+    8:"-",
+    12:"*",
+    13:"/",
+    1:".",
+
+    28:"i",
+    78:"P",
+    128:"E"
+}
+
+_SHIFT = False
+_CMD = False
+
 def parseInput(inp):
-    if inp in typeInputs:
+    global _SHIFT,_CMD
+    if _SHIFT: inp += 50
+    if _CMD: inp += 100
+
+    if inp in typeInputs.keys():
         updateScreen(["type",[inp]])
     elif inp == equalsKey:
         updateScreen(["enter",[]])
@@ -436,7 +470,14 @@ def parseInput(inp):
         updateScreen(["cursor",["down"]])
     elif inp == clearKey:
         updateScreen(["clear",[]])
+    elif inp == shiftKey:
+        _SHIFT = not _SHIFT
+        _CMD = False
+    elif inp == cmdKey:
+        _CMD = not _CMD
+        _SHIFT = False
 
     for key,v in delimInputs.items():
         if inp == key:
             updateScreen(["delim",[v]])
+

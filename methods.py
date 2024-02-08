@@ -40,6 +40,26 @@ def cubicSolve(a,b,c,d): #ax^3+bx^2+cx+d=0
              -(-3*c/a + b**2/a**2)/(3*(-1/2 + sqrt(3)*I/2)*(sqrt(-4*(-3*c/a + b**2/a**2)**3 + (27*d/a - 9*b*c/a**2 + 2*b**3/a**3)**2)/2 + 27*d/(2*a) - 9*b*c/(2*a**2) + b**3/a**3)**(1/3)) - (-1/2 + sqrt(3)*I/2)*(sqrt(-4*(-3*c/a + b**2/a**2)**3 + (27*d/a - 9*b*c/a**2 + 2*b**3/a**3)**2)/2 + 27*d/(2*a) - 9*b*c/(2*a**2) + b**3/a**3)**(1/3)/3 - b/(3*a)
              ])
 
+def cubicSolve2(a,b,c,d):
+    # turn into depressed cubic of form x^3 + px + q
+    third = 1/3
+    p = (3*a*c - b**2)/(3*a**2)
+    q = (2*b**3 -9*a*b*c + 27*d*a**2)/(27*a**3)
+
+    root_term = sqrt((27*q**2 -4*q*p**3)/27)
+
+    u0 = (-q + root_term)/2
+    u1 = (-q - root_term)/2
+    v0 = (q + root_term)/2
+    v1 = (q - root_term)/2
+
+    l = [u0**third - (v0**third) - (b/(3*a)),
+         u1**third - (v0**third) - (b/(3*a)),
+         u0**third - (v1**third) - (b/(3*a)),
+         u1**third - (v1**third) - (b/(3*a))]
+    # solve
+    return unique(l)
+
 def quarticSolve(a,b,c,d,e):
     # turn into a depressed quartic of form x^4+px^2+q+r
     p = (8*a*c -3*b**2)/(8*a**2)
