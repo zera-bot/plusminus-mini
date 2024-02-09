@@ -32,17 +32,17 @@ lambdas = {
     "sinh": lambda x: c_sinh(x),
     "tanh": lambda x: c_tanh(x),
 
-    "X": lambda x: Variable("x"),
-    "Y": lambda x: Variable("y"),
-    "Z": lambda x: Variable("z"),
+    "X": lambda _: "x",
+    "Y": lambda _: "y",
+    "Z": lambda _: "z",
 }
 
 string_lambdas = {
-    "Frac": lambda p,q: f"({p}/{q})",
-    "Power": lambda x,y: f"({x}/{y})",
-    "Mod": lambda x,y: f"({x}%{y})",
+    "Frac": lambda p,q: f"(({p})/({q}))",
+    "Power": lambda x,y: f"(({x})**({y}))",
+    "Mod": lambda x,y: f"(({x})%({y}))",
     "Sqrt": lambda x: f"(c_sqrt({x}))",
-    "NthRoot": lambda x,y: f"({x}**(NumericalComponent(frac(1))/{y}))", #yth root of x
+    "NthRoot": lambda x,y: f"(({x})**(NumericalComponent(frac(1))/({y})))", #yth root of x
     "LogBase": lambda x,base: f"(c_sqrt({x},{base}))",
     "Ln": lambda x: f"(c_ln({x}))",
     "Factorial": lambda x: f"(c_factorial({x}))",
@@ -67,6 +67,10 @@ string_lambdas = {
     "cosh": lambda x: f"(c_cosh({x}))",
     "sinh": lambda x: f"(c_sinh({x}))",
     "tanh": lambda x: f"(c_tanh({x}))",
+
+    "X": lambda _: "x",
+    "Y": lambda _: "y",
+    "Z": lambda _: "z",
 }
 
 numbersOfParameters = {
