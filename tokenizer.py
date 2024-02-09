@@ -2,7 +2,7 @@ import xmath, re, copy
 
 from comp import NumericalComponent
 from fractions import Fraction
-from delimiters import lambdas
+from delimiters import lambdas,string_lambdas
 
 #s = "123+[Frac]<3,[Frac]<[Frac]<6+4,1>,7>>+4323" #string
 #s = "3+-1.5"
@@ -305,3 +305,114 @@ def parse(main):
             finalString += i[1]
 
     return eval(finalString)
+
+
+"""
+
+parsing lambda expressions (this will probably only be used for graphing calculator
+implementations)
+
+this is *hell*
+
+"""
+
+def find_in_list(s,l):
+    for i in l:
+        if isinstance(i,list): 
+            if find_in_list(s,i): return True
+        elif s in l:
+            return True
+
+def parseSmallStatements_lambda(s: str):
+    """
+    !WARNING! Uses eval().
+    """
+    literals = re.split(r"[\+\-\*\/()]", s)
+    operators = re.findall(r"[\+\-\*\/()]", s)
+
+    evalString = ""
+
+    for ind, i in enumerate(literals):
+        n = i.replace("i", "")
+        if i == "i": n = "1"
+        if "i" in i:  #imaginary number
+            evalString += "NumericalComponent(imaginary=Fraction(" + n + "))"
+        elif "P" in i:  #pi multiple
+            n = i.replace("P", "")
+            if i == "P": n = "1"
+            evalString += "NumericalComponent(pi_multiple=Fraction(" + n + "))"
+        elif "E" in i:
+            n = i.replace("E", "")
+            if i == "E": n = "1"
+            evalString += "NumericalComponent(Fraction(" +n+ ")*xmath.e)"
+        else:
+            evalString += "NumericalComponent(Fraction(" + i + "))"
+
+        if ind != len(literals) - 1:
+            evalString += operators[ind]
+
+    return evalString
+
+
+def parse_lambda_main(main):
+    parsedMain = copy.deepcopy(main)
+
+    for ind, i in enumerate(parsedMain):
+        #parse all small statements first
+        if i[0] == "OTHER" and len(re.findall(r"[\+\-\*\/()]", i[1])) == 0:
+            parsedMain[ind] = parseSmallStatements_lambda(i[1])
+        elif i[0] == "DELIM":
+            for j in range(2, len(i)):
+                if isinstance(i[j], str):
+                    i[j] = parseSmallStatements_lambda(i[j])
+                elif isinstance(i[j], list):
+                    i[j] = parse_lambda_main(i[j])
+    
+    # then, evaluate all delimiters in the parsedMain list
+    for ind, i in enumerate(parsedMain):
+        if isinstance(i, list) and i[0] == "DELIM":
+            name = i[1]
+            value = string_lambdas[name](*i[2:])
+            parsedMain[ind] = value
+
+    # finally use the operators (+ - * /) to parse the expression using eval()
+    finalString = ""
+    for ind, i in enumerate(parsedMain):
+        #implied multiplication part 1
+        if isinstance(i, str):
+            if ind - 1 >= 0:
+                if isinstance(parsedMain[ind - 1], list) and parsedMain[ind-1][1] == ")":
+                    finalString += "*"
+            
+            """real = "Fraction(\"" + str(i.real.numerator) + "/" + str(
+                i.real.denominator) + "\")"
+            imag = "Fraction(\"" + str(i.imaginary.numerator) + "/" + str(
+                i.imaginary.denominator) + "\")"
+            pi_mul = "Fraction(\"" + str(i.pi_multiple.numerator) + "/" + str(
+                i.pi_multiple.denominator) + "\")"
+            sqrt_components = "[" 
+            for k in i.sqrt_components:
+                sqrt_components+=f"[Fraction(\"{str(k[0])}/1\"),Fraction(\"{str(k[1])}/1\")]"
+            sqrt_components+="]"
+
+            num = "NumericalComponent(real=" + real + ",imaginary=" + imag + ",pi_multiple=" + pi_mul + ",sqrt_components=" + sqrt_components + ")"
+            finalString += num
+            """
+            finalString += i
+
+            #implied multiplication
+            if ind + 1 < len(parsedMain):
+                if isinstance(parsedMain[ind + 1], NumericalComponent):
+                    finalString += "*"
+                if isinstance(parsedMain[ind + 1],list) and parsedMain[ind + 1][1] == "(":
+                    finalString += "*"
+        elif isinstance(i, list):  #operator
+            finalString += i[1]
+
+
+    #TODO FINISH !!!
+    _v=[] # variables
+    #if "[X]" in 
+
+    _v_str = ",".join(_v)
+    return eval(f"lambda {_v_str}: eval(finalString),finalString")
