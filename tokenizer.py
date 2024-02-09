@@ -316,10 +316,10 @@ this is *hell*
 
 """
 
-def find_in_list(s,l):
+def find_in_tokens(s,l):
     for i in l:
         if isinstance(i,list): 
-            if find_in_list(s,i): return True
+            if find_in_tokens(s,i): return True
         elif s in l:
             return True
 
@@ -368,14 +368,12 @@ def parse_lambda_main(main):
                 elif isinstance(i[j], list):
                     i[j] = parse_lambda_main(i[j])
     
-    # then, evaluate all delimiters in the parsedMain list
     for ind, i in enumerate(parsedMain):
         if isinstance(i, list) and i[0] == "DELIM":
             name = i[1]
             value = string_lambdas[name](*i[2:])
             parsedMain[ind] = value
 
-    # finally use the operators (+ - * /) to parse the expression using eval()
     finalString = ""
     for ind, i in enumerate(parsedMain):
         #implied multiplication part 1
@@ -383,21 +381,6 @@ def parse_lambda_main(main):
             if ind - 1 >= 0:
                 if isinstance(parsedMain[ind - 1], list) and parsedMain[ind-1][1] == ")":
                     finalString += "*"
-            
-            """real = "Fraction(\"" + str(i.real.numerator) + "/" + str(
-                i.real.denominator) + "\")"
-            imag = "Fraction(\"" + str(i.imaginary.numerator) + "/" + str(
-                i.imaginary.denominator) + "\")"
-            pi_mul = "Fraction(\"" + str(i.pi_multiple.numerator) + "/" + str(
-                i.pi_multiple.denominator) + "\")"
-            sqrt_components = "[" 
-            for k in i.sqrt_components:
-                sqrt_components+=f"[Fraction(\"{str(k[0])}/1\"),Fraction(\"{str(k[1])}/1\")]"
-            sqrt_components+="]"
-
-            num = "NumericalComponent(real=" + real + ",imaginary=" + imag + ",pi_multiple=" + pi_mul + ",sqrt_components=" + sqrt_components + ")"
-            finalString += num
-            """
             finalString += i
 
             #implied multiplication
@@ -409,10 +392,9 @@ def parse_lambda_main(main):
         elif isinstance(i, list):  #operator
             finalString += i[1]
 
-
-    #TODO FINISH !!!
     _v=[] # variables
-    #if "[X]" in 
-
+    if find_in_tokens("[X]",main): _v.append("X")
+    if find_in_tokens("[Y]",main): _v.append("Y")
+    if find_in_tokens("[Z]",main): _v.append("Z")
     _v_str = ",".join(_v)
-    return eval(f"lambda {_v_str}: eval(finalString),finalString")
+    return eval(f"lambda {_v_str}: finalString"),finalString
