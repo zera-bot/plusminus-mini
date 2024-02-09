@@ -6,7 +6,7 @@ from delimiters import lambdas,string_lambdas
 
 #s = "123+[Frac]<3,[Frac]<[Frac]<6+4,1>,7>>+4323" #string
 #s = "3+-1.5"
-
+legalVars = ["x","y","z","X","Y","Z"]
 
 """
 Tokenizer should take a string and transform it into a list or two of tokens.
@@ -312,11 +312,6 @@ def parse(main):
 parsing lambda expressions (this will probably only be used for graphing calculator
 implementations)
 
-put in a tokenized string and it will return a lambda
-function. If you have more than one variable,
-the arguments in order will be whatever is included of
-X, Y, Z
-
 """
 
 def parseSmallStatements_lambda(s: str):
@@ -350,7 +345,7 @@ def parseSmallStatements_lambda(s: str):
     return evalString
 
 
-def parse_lambda_main(main):
+def parse_lambda(main):
     parsedMain = copy.deepcopy(main)
 
     for ind, i in enumerate(parsedMain):
@@ -362,7 +357,7 @@ def parse_lambda_main(main):
                 if isinstance(i[j], str):
                     i[j] = parseSmallStatements_lambda(i[j])
                 elif isinstance(i[j], list):
-                    _,i[j] = parse_lambda_main(i[j])
+                    _,i[j] = parse_lambda(i[j])
 
     for ind, i in enumerate(parsedMain):
         if isinstance(i, list) and i[0] == "DELIM":
@@ -371,22 +366,27 @@ def parse_lambda_main(main):
             parsedMain[ind] = value
 
     finalString = ""
+    beforeHasRightImpliedMultiply = False
     for ind, i in enumerate(parsedMain):
         #implied multiplication part 1
         if isinstance(i, str):
-            if ind - 1 >= 0:
-                if isinstance(parsedMain[ind - 1], list) and parsedMain[ind-1][1] == ")":
+            if ( #large condition hehe
+                ind - 1 >= 0 and isinstance(parsedMain[ind - 1], str)
+                and parsedMain[ind-1][len(parsedMain[ind-1])-1] == ")"
+                and not beforeHasRightImpliedMultiply
+                ):
                     finalString += "*"
-                if isinstance(parsedMain[ind - 1], str) and parsedMain[ind-1][len(parsedMain[ind-1])-1] == ")":
-                    finalString += "*"
+                    
             finalString += i
 
             #implied multiplication
             if ind + 1 < len(parsedMain):
-                if isinstance(parsedMain[ind + 1], NumericalComponent):
+                if "NumericalComponent" in parsedMain[ind+1]:
                     finalString += "*"
-                if isinstance(parsedMain[ind + 1],list) and parsedMain[ind + 1][1] == "(":
-                    finalString += "*"
+                    beforeHasRightImpliedMultiply=True
+                if parsedMain[ind+1] in legalVars: 
+                    finalString+="*"
+                    beforeHasRightImpliedMultiply=True
         elif isinstance(i, list):  #operator
             finalString += i[1]
 

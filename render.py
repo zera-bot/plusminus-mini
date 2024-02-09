@@ -303,6 +303,11 @@ class DelimiterExpression:
 
             points+=offsetPointList(inputExpression.points,0,math.floor((height-inputExpression.height)/2))
             points+=offsetPointList(symbol.points,inputExpression.width+1,math.floor((height-symbol.height)/2))
+        elif delim in ["X","Y","Z"]:
+            letter = BaseException(delim.lower())
+            height = letter.height
+            width = letter.width
+            points+=letter.points
 
         self.width = width
         self.height = height

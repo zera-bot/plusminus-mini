@@ -149,6 +149,10 @@ def parserTest():
     for i in l:
         print(str(parse(tokenize(i))))
 
+    # example for lambda parsing 
+    #func,_ = parse_lambda(tokenize("[Frac]<-[X][Y][Pi],[Z]>"))
+    #print(func(1,2,3))
+
 def systemTest():
     tests = [
         ["type",["3"]],
