@@ -226,11 +226,24 @@ def updateScreen(action):
     global data,currentMode,currentScreen
     parameters = action[1]
     #action in format ["type", [stuff]]
+
+    # menu stuff
     if action[0] == "menu":
         data = {}
         currentMode = "MENU"
-    elif action[0] == "cursor":
-        if currentMode == "CALC":
+
+    if currentMode == "MENU":
+        if action[0] == "type":
+            if parameters[0] == "1":
+                currentMode = "CALC"
+                data = defaultDatas["CALC"]
+            elif parameters[0] == "2":
+                currentMode = "SOLV"
+                data = defaultDatas["SOLV"]
+    
+    # calculation modes
+    if currentMode == "CALC":
+        if action[0] == "cursor":
             if data["recievedAns"] == True: #doesnt matter if left or right
                 data["recievedAns"]=False
                 data["currentAns"]=""
@@ -248,7 +261,50 @@ def updateScreen(action):
                     elif parameters[0] == "down":
                         data["scroll"]+=5
                         if data["scroll"]>getMaxScreenHeight(data["expr"]): data["scroll"]=getMaxScreenHeight(data["expr"])
-        elif currentMode == "SOLV":
+        elif action[0] == "type": #we are typing something
+            if currentMode == "CALC":
+                if data["recievedAns"] == True:
+                    data["recievedAns"]=False
+                    data["currentAns"]=""
+                    data["expr"] = parameters[0]
+                    data["cursor"] = 0
+                else:
+                    data["expr"] = mathcode.isap(data["expr"],data["cursor"],parameters[0])
+                    data["cursor"]+=1
+        elif action[0] == "delim":
+            if data["recievedAns"] == True:
+                data["recievedAns"]=False
+                data["currentAns"]=""
+                data["expr"]=""
+                data["cursor"]=0
+            data["expr"],data["cursor"] = mathcode.addDelimiter(data["expr"],data["cursor"],parameters[0],
+                                                                    delimiters.numbersOfParameters[parameters[0]])
+        elif action[0] == "clear":
+            data["recievedAns"] = False
+            data["currentAns"] = False
+            data["expr"] = ""
+            data["cursor"] = 0
+        elif action[0] == "backspace":
+            if data["recievedAns"] == True:
+                data["recievedAns"] = False
+                data["currentAns"] = False
+                data["expr"] = ""
+                data["cursor"] = 0
+            else:
+                data["expr"],data["cursor"]=mathcode.backspace(data["expr"],data["cursor"])
+        elif action[0] == "enter":
+            data["recievedAns"] = True
+            try:
+                answer = tokenizer.parse(tokenizer.tokenize(data["expr"]))
+                if answer.isLong():
+                    answer = DecimalRepresentation(answer,8)
+
+                data["currentAns"] = NCToExpression(answer)
+            except Exception:
+                data["currentAns"] = "-"
+
+    if currentMode == "SOLV":
+        if action[0] == "cursor":
             if not data["hasAns"]:
                 if parameters[0] == "left":
                     data["expr"],data["cursor"] = mathcode.incrementCursorLeft(data["expr"],data["cursor"])
@@ -260,78 +316,25 @@ def updateScreen(action):
                 elif parameters[0] == "down":
                     data["scroll"]+=5
                     if data["scroll"]>getMaxScreenHeight(data["expr"]): data["scroll"]=getMaxScreenHeight(data["expr"])
-
-    elif action[0] == "type": #we are typing something
-        if currentMode == "CALC":
-            if data["recievedAns"] == True:
-                data["recievedAns"]=False
-                data["currentAns"]=""
-                data["expr"] = parameters[0]
-                data["cursor"] = 0
-            else:
-                data["expr"] = mathcode.isap(data["expr"],data["cursor"],parameters[0])
-                data["cursor"]+=1
-        elif currentMode == "SOLV":
+        elif action[0] == "type": #we are typing something
             if not data["hasAns"]:
                 data["expr"] = mathcode.isap(data["expr"],data["cursor"],parameters[0])
                 data["cursor"]+=1
-        elif currentMode == "MENU": #menu selection
-            if parameters[0] == "1":
-                currentMode = "CALC"
-                data = defaultDatas["CALC"]
-            elif parameters[0] == "2":
-                currentMode = "SOLV"
-                data = defaultDatas["SOLV"]
-    elif action[0] == "delim":
-        if currentMode == "CALC":
-            if data["recievedAns"] == True:
-                data["recievedAns"]=False
-                data["currentAns"]=""
-                data["expr"]=""
-                data["cursor"]=0
-            data["expr"],data["cursor"] = mathcode.addDelimiter(data["expr"],data["cursor"],parameters[0],
-                                                                    delimiters.numbersOfParameters[parameters[0]])
-        elif currentMode == "SOLV":
+        elif action[0] == "delim":
             if not data["hasAns"]:
                 data["expr"],data["cursor"] = mathcode.addDelimiter(data["expr"],data["cursor"],parameters[0],
                                                         delimiters.numbersOfParameters[parameters[0]])
-    elif action[0] == "clear":
-        if currentMode == "CALC":
-            data["recievedAns"] = False
-            data["currentAns"] = False
-            data["expr"] = ""
-            data["cursor"] = 0
-        elif currentMode == "SOLV":
+        elif action[0] == "clear":
             if data["hasAns"]:
                 data = deepcopy(defaultDatas["SOLV"])
             else:
                 data["expr"] = ""
                 data["cursor"] = 0
-    elif action[0] == "backspace":
-        if currentMode == "CALC":
-            if data["recievedAns"] == True:
-                data["recievedAns"] = False
-                data["currentAns"] = False
-                data["expr"] = ""
-                data["cursor"] = 0
-            else:
-                data["expr"],data["cursor"]=mathcode.backspace(data["expr"],data["cursor"])
-        elif currentMode == "SOLV":
+        elif action[0] == "backspace":
             if not data["hasAns"]:
                 data["expr"],data["cursor"]=mathcode.backspace(data["expr"],data["cursor"])
-    elif action[0] == "enter":
-        if currentMode == "CALC":
-            data["recievedAns"] = True
 
-            try:
-                answer = tokenizer.parse(tokenizer.tokenize(data["expr"]))
-                if answer.isLong():
-                    answer = DecimalRepresentation(answer,8)
-
-                data["currentAns"] = NCToExpression(answer)
-            except Exception as e:
-                data["currentAns"] = "-"
-        elif currentMode == "SOLV":
+        elif action[0] == "enter":
             data["currentPower"]-=1
             data["inputs"].append(tokenizer.parse(tokenizer.tokenize(data["expr"])))
 
