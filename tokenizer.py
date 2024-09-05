@@ -30,16 +30,12 @@ def splitStringByNonNestedCommas(s):
     l = []
     currentLiteral = ""
 
-    bracketList = []
+    openBrackets = 0
     for c in [*s]:
-        if c == "<": bracketList.append("<")
-        elif c == ">": bracketList.append(">")
+        if c == "<": openBrackets+=1
+        elif c == ">": openBrackets-=1
 
-        if "<" in bracketList and ">" in bracketList:
-            bracketList.remove("<")
-            bracketList.remove(">")
-
-        if len(bracketList) == 0 and c == ",":
+        if openBrackets == 0 and c == ",":
             l.append(currentLiteral)
             currentLiteral = ""
         else:
@@ -89,17 +85,13 @@ def miniTokenizeMain(s: str):
             # until after the already parsed delimiter
 
             # get start and end of triangle brackets of delimiter (and form substring)
-            bracketList = ["<"]
+            openBrackets = 1
             inputsStartingInd = pseudoInd + 1
             inputsEndingInd = pseudoInd + 1
-            while len(bracketList) != 0:
+            while openBrackets != 0:
                 inputsEndingInd += 1
-                if s[inputsEndingInd] == "<": bracketList.append("<")
-                elif s[inputsEndingInd] == ">": bracketList.append(">")
-
-                if "<" in bracketList and ">" in bracketList:
-                    bracketList.remove("<")
-                    bracketList.remove(">")
+                if s[inputsEndingInd] == "<": openBrackets+=1
+                elif s[inputsEndingInd] == ">": openBrackets-=1
 
             #delimiterInputsString is the stuff inside the triangle brackets
             delmiterInputsString = ssB(s, inputsStartingInd + 1,
