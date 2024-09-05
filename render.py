@@ -352,9 +352,7 @@ use the tokenizer to give us a lost of tokens (not evaluated)
 Convert any shallow operators back into strings so that the only things 
 that are in the token list are delimiters and strings
 
-assign a configuration (of lights to be on) for each element without nests inside 
-of the nests list, then do the same for the ones with nested elements (in reverse) 
-just like in the parser
+assign a configuration (of lights to be on) for each element with recursion to handle nested elements
 
 STEP 2:
 then sort of combine those elements

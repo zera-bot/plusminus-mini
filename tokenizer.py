@@ -9,46 +9,14 @@ from delimiters import lambdas,string_lambdas
 legalVars = ["x","y","z","X","Y","Z"]
 
 """
-Tokenizer should take a string and transform it into a list or two of tokens.
-For the s example, it should yield something like
+Tokenizer should take a string and transform it into a list of tokens.
 
-List 1 (main list)
-[ ("DELIM","Frac",3,NestedElementComponent(1)), ("OPERATOR","+"), ("LITERAL",4) ]
+The parse function will be able to evaluate a tokenized input into a number result.
 
-List 2 (dictionary containing only nested elements)
-{"1":[("DELIM","Frac",6,7)]}
+The parse_lambda function can do the same but it will evaluate a tokenized input into a
+lambda function.
 
 """
-
-#make sure that if a number is next to a variable it is multiplied
-#(include implied multiplication)
-"""
-Tokenizer:
-
-Mini-tokenize a list of each delimiter by converting the delimiters to a 
-list like such:
-[ ["DELIM","Frac","3","[Frac]<6,7>"], ["OTHER","+4"] ]
-
-Then, use a while loop to detect any nested elements and add them to a mini-tokenized
-dictionary.
-The end result should be as such:
-
-main = [ ["DELIM","Frac",3,NestedElementComponent(1)], ["OTHER","+4"] ]
-nests = {"1":["DELIM","Frac",6,7]}
-
-"""
-
-
-def findOpenIndex(d: dict):
-    n = 0
-    while True:
-        try:
-            k = d[str(n)]
-            n += 1
-        except:
-            break
-    return str(n)
-
 
 def ssB(string, a, b):
     # get a substring between characters a and b of a string
@@ -79,13 +47,6 @@ def splitStringByNonNestedCommas(s):
 
     if currentLiteral != "": l.append(currentLiteral)
     return l
-
-
-"""
-Exploring a nested list and pulling an element (no need to generate an ID because lists point to a
-reference in memory)
-"""
-
 
 def findFirstNestedElement(l):
     if isinstance(l, list):
@@ -177,7 +138,7 @@ def tokenize(s):
     #s = s.replace("+-", "-")
     main = miniTokenizeMain(s)
 
-    #Now we will move through each nested delimiter and add them to the nests dictionary.
+    #Now we will process each nested delimiter
     while True:
         if findFirstNestedElement(main) == None: break
         n, nind = findFirstNestedElement(main)
