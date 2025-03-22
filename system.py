@@ -240,6 +240,9 @@ def updateScreen(action):
             elif parameters[0] == "2":
                 currentMode = "SOLV"
                 data = defaultDatas["SOLV"]
+
+        renderUpdate()
+        return
     
     # calculation modes
     if currentMode == "CALC":

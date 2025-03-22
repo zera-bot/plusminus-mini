@@ -186,7 +186,7 @@ def systemTest():
         ["type",["6"]],
         ["cursor",["right"]],
         ["type",["-"]],
-        ["type",["2"]],
+        ["type",["3"]],
         ["type",["P"]],
         ["enter",[]],
     ]

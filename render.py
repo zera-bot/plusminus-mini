@@ -41,7 +41,7 @@ class BaseExpression: #only store data for expressions
         self.isSmall = isSmall
 
         points = []
-        characters = [renderformats.smallNumbers[k] for k in [*value]] if isSmall else [renderformats.bigNumbers[k] for k in [*value]] 
+        characters = [renderformats.smallNumbers[k] for k in list(value)] if isSmall else [renderformats.bigNumbers[k] for k in list(value)] 
         self.height = max([k["height"] for k in characters])
         self.width = sum([k["width"] for k in characters])
         

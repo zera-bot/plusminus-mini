@@ -4,6 +4,39 @@ from comp import NumericalComponent
 from fractions import Fraction
 from delimiters import lambdas,string_lambdas
 
+def findall(pattern, text):
+    """
+    Uses findall() if able to.
+    Mimics findall() using re.search() if not possible
+    """
+    if "findall" in dir(re):
+        return re.findall(pattern,text)
+    else:
+        
+        matches = []
+        while True:
+            match = re.search(pattern, text)
+            if not match:
+                break
+            matches.append(match.group())  # Add the matched text
+            text = text[match.end():]  # Move forward in the string to find the next match
+        return matches
+    
+def split(pattern, text):
+    """Mimics split() using re.search() in MicroPython."""
+    if "split" in dir(re):
+        return re.split(pattern,text)
+    else:
+        parts = []
+        while True:
+            match = re.search(pattern, text)
+            if not match:
+                break
+            parts.append(text[:match.start()])  # Add the part before the match
+            text = text[match.end():]  # Move forward in the string after the match
+        parts.append(text)  # Add the remaining part of the string
+        return parts
+
 #s = "123+[Frac]<3,[Frac]<[Frac]<6+4,1>,7>>+4323" #string
 #s = "3+-1.5"
 legalVars = ["x","y","z","X","Y","Z"]
@@ -31,7 +64,7 @@ def splitStringByNonNestedCommas(s):
     currentLiteral = ""
 
     openBrackets = 0
-    for c in [*s]:
+    for c in list(s):
         if c == "<": openBrackets+=1
         elif c == ">": openBrackets-=1
 
@@ -63,7 +96,7 @@ def miniTokenizeMain(s: str):
 
     currentLiteral = ""
     indexToSkipTo = -1
-    for ind, c in enumerate([*s]):
+    for ind, c in enumerate(list(s)):
         if ind < indexToSkipTo: continue
 
         if c == "[":
@@ -97,10 +130,7 @@ def miniTokenizeMain(s: str):
             delmiterInputsString = ssB(s, inputsStartingInd + 1,
                                        inputsEndingInd)
 
-            main.append([
-                "DELIM", delimName,
-                *splitStringByNonNestedCommas(delmiterInputsString)
-            ])
+            main.append(["DELIM", delimName,] + splitStringByNonNestedCommas(delmiterInputsString))
             indexToSkipTo = inputsEndingInd + 1
         else:
             currentLiteral += c
@@ -139,13 +169,13 @@ def tokenize(s):
 
     #combine numbers that have been separated into characters back together
     for ind, i in enumerate(main):
-        if i[0] == "OTHER" and len(re.findall(r"[\+\-\*\/()~]", i[1])) == 0:
+        if i[0] == "OTHER" and len(findall(r"[\+\-\*\/()~]", i[1])) == 0:
             currentLiteral = ""
             endingInd = ind
 
             while endingInd < len(
                     main) and main[endingInd][0] == "OTHER" and len(
-                        re.findall(r"[\+\-\*\/()~]", main[endingInd][1])) == 0:
+                        findall(r"[\+\-\*\/()~]", main[endingInd][1])) == 0:
                 currentLiteral += main[endingInd][1]
                 endingInd += 1
 
@@ -167,8 +197,8 @@ def parseSmallStatements(s: str):
     """
     !WARNING! Uses eval().
     """
-    literals = re.split(r"[\+\-\*\/()]", s)
-    operators = re.findall(r"[\+\-\*\/()]", s)
+    literals = split(r"[\+\-\*\/()]", s)
+    operators = findall(r"[\+\-\*\/()]", s)
 
     evalString = ""
 
@@ -209,7 +239,7 @@ def parse(main):
 
     for ind, i in enumerate(parsedMain):
         #parse all small statements first
-        if i[0] == "OTHER" and len(re.findall(r"[\+\-\*\/()]", i[1])) == 0:
+        if i[0] == "OTHER" and len(findall(r"[\+\-\*\/()]", i[1])) == 0:
             parsedMain[ind] = parseSmallStatements(i[1])
         elif i[0] == "DELIM":
             for j in range(2, len(i)):
@@ -271,8 +301,8 @@ def parseSmallStatements_lambda(s: str):
     """
     !WARNING! Uses eval().
     """
-    literals = re.split(r"[\+\-\*\/()]", s)
-    operators = re.findall(r"[\+\-\*\/()]", s)
+    literals = split(r"[\+\-\*\/()]", s)
+    operators = findall(r"[\+\-\*\/()]", s)
 
     evalString = ""
 
@@ -303,7 +333,7 @@ def parse_lambda(main):
 
     for ind, i in enumerate(parsedMain):
         #parse all small statements first
-        if i[0] == "OTHER" and len(re.findall(r"[\+\-\*\/()]", i[1])) == 0:
+        if i[0] == "OTHER" and len(findall(r"[\+\-\*\/()]", i[1])) == 0:
             parsedMain[ind] = parseSmallStatements_lambda(i[1])
         elif i[0] == "DELIM":
             for j in range(2, len(i)):

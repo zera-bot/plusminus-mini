@@ -422,10 +422,10 @@ class ScientificNotationRepresentation:
         
         rc = 1
         ic = 1
-        for char in [*realString]:
+        for char in list(realString):
             if char != "0": break
             else: rc+=1
-        for char in [*imagString]:
+        for char in list(imagString):
             if char != "0": break
             else: ic+=1
 
